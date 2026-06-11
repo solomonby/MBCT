@@ -190,34 +190,39 @@ body {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 12px 12px 12px 14px;
+  padding: 14px 14px 14px 14px;
   margin-bottom: 8px;
   cursor: pointer;
-  display: grid;
-  grid-template-columns: 32px 1fr 16px;
-  gap: 10px;
-  align-items: start;
   box-shadow: var(--shadow-card);
   transition: background .15s, transform .1s;
   -webkit-tap-highlight-color: transparent;
 }
 .feature-card:active { transform: scale(0.985); }
+.feature-card-header {
+  display: grid; grid-template-columns: 32px 1fr 16px;
+  gap: 10px; align-items: center;
+}
 
 .feature-num {
   width: 32px; height: 32px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 700; flex-shrink: 0; margin-top: 1px;
+  font-size: 12px; font-weight: 700; flex-shrink: 0;
 }
 .part-1 .feature-num { background: var(--part1-bg); color: var(--part1); }
 .part-2 .feature-num { background: var(--part2-bg); color: var(--part2); }
 
-.feature-info { min-width: 0; }
-.feature-title { font-size: 14px; font-weight: 600; line-height: 1.35; color: var(--text); margin-bottom: 3px; }
-.feature-preview {
-  font-size: 12px; color: var(--text-soft); line-height: 1.45;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+.feature-title { font-size: 14px; font-weight: 600; line-height: 1.35; color: var(--text); }
+.card-arrow { color: var(--border); flex-shrink: 0; }
+
+.feature-summary {
+  padding-left: 42px; margin-top: 8px;
+  font-family: var(--font-body); font-size: 13.5px;
+  line-height: 1.72; color: var(--text-soft);
 }
-.card-arrow { color: var(--border); margin-top: 2px; flex-shrink: 0; }
+.feature-summary p { margin-bottom: 0.55em; }
+.feature-summary p:last-child { margin-bottom: 0; }
+.feature-summary ul { padding-left: 1.1em; margin-bottom: 0.55em; }
+.feature-summary li { margin-bottom: 0.35em; line-height: 1.6; }
 
 /* ══════════════════════════════════════
    TEACHING DETAIL VIEW
@@ -350,6 +355,11 @@ body {
   padding: 2px 0 2px 16px; margin: 1.2em 0;
   color: var(--text-soft); font-style: italic;
 }
+.footnote-line {
+  font-size: 0.82em; color: var(--text-soft);
+  margin-top: 1.2em; padding-top: 0.6em;
+  border-top: 1px solid var(--border);
+}
 .chapter-body ul, .chapter-body ol { padding-left: 1.4em; margin-bottom: 1.1em; }
 .chapter-body li { margin-bottom: .5em; line-height: 1.7; }
 </style>
@@ -389,17 +399,17 @@ body {
     <!-- Journey sections -->
     <div id="teachings-container"></div>
 
-    <!-- All Features (collapsible) -->
+    <!-- All Chapters (collapsible) -->
     <div class="toc-toggle" onclick="toggleTOC()" role="button" aria-expanded="false" id="toc-toggle">
-      <h2>All 30 Features</h2>
+      <h2>All 30 Chapters</h2>
       <span class="toc-toggle-icon" id="toc-icon">&#9660;</span>
     </div>
     <div id="toc-features">
       <div class="part-section part-1" id="part1-section">
-        <div class="part-label">Part 1 &mdash; Theoretical Features (1–15)</div>
+        <div class="part-label">Part 1 &mdash; Theory (Chapters 1–15)</div>
       </div>
       <div class="part-section part-2" id="part2-section">
-        <div class="part-label">Part 2 &mdash; Practical Features (16–30)</div>
+        <div class="part-label">Part 2 &mdash; Practice (Chapters 16–30)</div>
       </div>
     </div>
   </div>
@@ -409,7 +419,7 @@ body {
     <div class="teaching-hero">
       <div class="teaching-source" id="teaching-source-chip" onclick="goToChapterFromTeaching()">
         <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><rect width="10" height="10" rx="2"/></svg>
-        <span id="teaching-source-label">Feature 4</span>
+        <span id="teaching-source-label">Chapter 1</span>
       </div>
       <div class="teaching-hero-title" id="teaching-hero-title"></div>
     </div>
@@ -604,9 +614,12 @@ function renderParas(text) {
       continue;
     }
 
-    // Short parenthetical citation or footnote reference
-    if (lines.length === 1 && joined.length < 100 && (/^\(/.test(joined) || /^\d+ /.test(joined))) {
-      html += `<p style="color:var(--text-soft);font-size:.85em;margin-top:-.5em">${escHtml(joined)}</p>`;
+    // Footnote or parenthetical citation — digit-started, or publisher reference
+    const isFootnote = /^\d+\s+[A-Za-z]/.test(joined) ||
+      (joined.length < 120 && /^\(/.test(joined)) ||
+      /Holistic Health|Hyperion|Davis Company|Flamingo|Plume|Routledge/.test(joined);
+    if (isFootnote) {
+      html += `<p class="footnote-line">${escHtml(joined)}</p>`;
       continue;
     }
 
@@ -856,26 +869,88 @@ function renderHomeContent() {
   container.appendChild(actionSec);
 }
 
-/* ═══ FEATURE CARDS (TOC) ═══ */
+/* ═══ CHAPTER SUMMARY UTILS ═══ */
+
+// Fix PDF artifact: bullet markers on separate lines from their text.
+// Merges consecutive bullet-only paragraphs with the N text paragraphs that follow.
+function fixSplitBullets(text) {
+  const paras = text.split('\n\n');
+  const result = [];
+  let i = 0;
+  while (i < paras.length) {
+    const lines = paras[i].split('\n').map(l => l.trim()).filter(Boolean);
+    if (lines.length > 0 && lines.every(l => l === '·')) {
+      // Merge consecutive bullet-only paragraphs
+      let totalBullets = lines.length;
+      let j = i + 1;
+      while (j < paras.length) {
+        const nl = paras[j].split('\n').map(l => l.trim()).filter(Boolean);
+        if (nl.length > 0 && nl.every(l => l === '·')) { totalBullets += nl.length; j++; }
+        else break;
+      }
+      // Pair with the next totalBullets text paragraphs
+      const items = [];
+      for (let k = 0; k < totalBullets && j + k < paras.length; k++) {
+        items.push('· ' + paras[j + k].replace(/\n/g, ' ').replace(/\s+/g, ' ').trim());
+      }
+      if (items.length) { result.push(items.join('\n')); i = j + items.length; continue; }
+    }
+    result.push(paras[i]);
+    i++;
+  }
+  return result.join('\n\n');
+}
+
+function extractSummary(ch) {
+  const idx = ch.body.lastIndexOf('Summary\n');
+  if (idx < 0) return null;
+  return ch.body.slice(idx + 'Summary\n'.length).trim();
+}
+
+function renderFeatureSummary(raw) {
+  const paras = fixSplitBullets(raw).split('\n\n').filter(p => p.trim());
+  let html = '';
+  for (const p of paras) {
+    const flat = p.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!flat || flat.length < 10) continue;
+    // Skip bullet-only residue
+    if (/^[·\s]+$/.test(flat)) continue;
+    // Bullet list paragraph
+    if (flat.startsWith('·')) {
+      const items = flat.split(/\s*·\s*/).filter(s => s.trim());
+      html += '<ul>' + items.map(s => `<li>${escHtml(s.trim())}</li>`).join('') + '</ul>';
+      continue;
+    }
+    html += `<p>${escHtml(flat)}</p>`;
+  }
+  return html;
+}
+
+/* ═══ CHAPTER CARDS (TOC) ═══ */
 function renderFeatureCards() {
   const p1 = document.getElementById('part1-section');
   const p2 = document.getElementById('part2-section');
   CHAPTERS.forEach(ch => {
     const card = document.createElement('div');
     card.className = `feature-card part-${ch.part}`;
-    card.setAttribute('role','button'); card.setAttribute('tabindex','0');
+    card.setAttribute('role', 'button'); card.setAttribute('tabindex', '0');
     card.onclick = () => showChapter(ch.id);
-    card.onkeydown = e => { if (e.key==='Enter'||e.key===' ') showChapter(ch.id); };
-    let preview = ch.preview.replace(/^\s*\d{1,2}\s*\)\s*/,'').replace(/\n/g,' ').trim().slice(0,140);
+    card.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') showChapter(ch.id); };
+
+    const rawSummary = extractSummary(ch);
+    const summaryHtml = rawSummary
+      ? renderFeatureSummary(rawSummary)
+      : `<p>${escHtml(ch.preview.replace(/^\s*\d{1,2}\s*\)\s*/, '').replace(/\n/g, ' ').trim().slice(0, 220))}</p>`;
+
     card.innerHTML = `
-      <div class="feature-num">${ch.id}</div>
-      <div class="feature-info">
+      <div class="feature-card-header">
+        <div class="feature-num">${ch.id}</div>
         <div class="feature-title">${escHtml(ch.title)}</div>
-        <div class="feature-preview">${escHtml(preview)}</div>
+        <svg class="card-arrow" width="7" height="12" viewBox="0 0 7 12" fill="none">
+          <path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
       </div>
-      <svg class="card-arrow" width="7" height="12" viewBox="0 0 7 12" fill="none">
-        <path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>`;
+      <div class="feature-summary">${summaryHtml}</div>`;
     (ch.part === 1 ? p1 : p2).appendChild(card);
   });
 }
@@ -895,7 +970,7 @@ function showTeaching(id, push = true) {
   document.getElementById('back-label').textContent = navStack.length > 2 ? 'Back' : 'Home';
   document.getElementById('header-title').textContent = t.title;
 
-  document.getElementById('teaching-source-label').textContent = `Feature ${t.chapterId}`;
+  document.getElementById('teaching-source-label').textContent = `Chapter ${t.chapterId}`;
   document.getElementById('teaching-hero-title').textContent = t.title;
   document.getElementById('full-chapter-link-title').textContent = ch.title;
 
@@ -946,7 +1021,7 @@ function showChapter(id, push = true) {
   if (push) navStack.push(`chapter:${id}`);
   document.getElementById('btn-back').classList.add('visible');
   document.getElementById('back-label').textContent = navStack.length > 2 ? 'Back' : 'Home';
-  document.getElementById('header-title').textContent = `Feature ${ch.id}`;
+  document.getElementById('header-title').textContent = `Chapter ${ch.id}`;
 
   const tag = document.getElementById('chapter-tag');
   tag.textContent = ch.part === 1 ? 'Theory' : 'Practice';
@@ -964,7 +1039,7 @@ function showChapter(id, push = true) {
     }
     body = body.slice(i).trim();
   }
-  document.getElementById('chapter-body').innerHTML = renderParas(body);
+  document.getElementById('chapter-body').innerHTML = renderParas(fixSplitBullets(body));
 
   showView('view-chapter');
   const cv = document.getElementById('view-chapter');
