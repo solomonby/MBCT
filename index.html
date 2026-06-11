@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#4a7060" id="theme-meta">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="MBCT">
+<link rel="manifest" href="manifest.json">
+<title>MBCT: Distinctive Features</title>
+<style>
+/* ── Reset & Variables ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f8f6f1;
+  --bg-card: #ffffff;
+  --bg-elevated: #f0ede6;
+  --text: #2d2926;
+  --text-soft: #6b6560;
+  --accent: #4a7060;
+  --accent-light: #e4eeea;
+  --part1: #4a7060;
+  --part1-bg: #e4eeea;
+  --part2: #5a5a8a;
+  --part2-bg: #eaeaf4;
+  --border: #e0dcd4;
+  --shadow: 0 1px 4px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.04);
+  --shadow-card: 0 2px 8px rgba(0,0,0,.08);
+  --radius: 14px;
+  --radius-sm: 8px;
+  --font-body: Georgia, 'Times New Roman', serif;
+  --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+}
+
+[data-theme="dark"] {
+  --bg: #1c1917;
+  --bg-card: #252220;
+  --bg-elevated: #2a2724;
+  --text: #e8e0d4;
+  --text-soft: #8a8278;
+  --accent: #6a9a80;
+  --accent-light: #1e3028;
+  --part1: #6a9a80;
+  --part1-bg: #1e3028;
+  --part2: #8080b0;
+  --part2-bg: #22223a;
+  --border: #3a3630;
+  --shadow: 0 1px 4px rgba(0,0,0,.2), 0 4px 16px rgba(0,0,0,.15);
+  --shadow-card: 0 2px 8px rgba(0,0,0,.25);
+}
+
+html { font-size: 16px; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  min-height: 100dvh;
+  transition: background .25s, color .25s;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── App Shell ── */
+#app { max-width: 640px; margin: 0 auto; }
+
+/* ── Header ── */
+.app-header {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--bg); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px;
+  padding-top: max(12px, env(safe-area-inset-top));
+  transition: background .25s, border-color .25s;
+}
+.app-header h1 {
+  font-family: var(--font-ui);
+  font-size: 17px; font-weight: 600;
+  color: var(--text);
+  flex: 1;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.header-back {
+  display: none; align-items: center; gap: 6px;
+  font-size: 15px; color: var(--accent);
+  background: none; border: none; cursor: pointer;
+  padding: 4px 0; font-family: var(--font-ui);
+  flex-shrink: 0;
+}
+.header-back svg { flex-shrink: 0; }
+.header-back.visible { display: flex; }
+.header-subtitle {
+  display: none; font-size: 13px; color: var(--text-soft);
+  font-weight: 400;
+}
+.header-subtitle.visible { display: block; }
+
+.btn-icon {
+  background: none; border: none; cursor: pointer;
+  color: var(--text-soft); padding: 6px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: color .2s, background .2s;
+}
+.btn-icon:hover { color: var(--text); background: var(--bg-elevated); }
+
+/* ── TOC View ── */
+#view-toc { padding-bottom: 32px; }
+
+.toc-hero {
+  padding: 28px 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.toc-hero p {
+  font-size: 14px; color: var(--text-soft); line-height: 1.5;
+  margin-top: 6px;
+}
+
+.part-section { padding: 0 16px; margin-top: 24px; }
+.part-label {
+  font-size: 11px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--text-soft);
+  padding: 0 0 12px;
+}
+
+.feature-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 14px 14px 16px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: 36px 1fr 20px;
+  gap: 12px;
+  align-items: start;
+  box-shadow: var(--shadow-card);
+  transition: background .15s, border-color .15s, transform .1s;
+  -webkit-tap-highlight-color: transparent;
+}
+.feature-card:active { transform: scale(0.985); }
+
+.feature-num {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700;
+  flex-shrink: 0; margin-top: 1px;
+}
+.part-1 .feature-num { background: var(--part1-bg); color: var(--part1); }
+.part-2 .feature-num { background: var(--part2-bg); color: var(--part2); }
+
+.feature-info { min-width: 0; }
+.feature-title {
+  font-size: 15px; font-weight: 600; line-height: 1.35;
+  color: var(--text); margin-bottom: 5px;
+}
+.feature-preview {
+  font-size: 13px; color: var(--text-soft); line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-arrow {
+  color: var(--border); margin-top: 4px; flex-shrink: 0;
+  transition: color .15s;
+}
+.feature-card:hover .card-arrow { color: var(--accent); }
+
+/* ── Chapter View ── */
+#view-chapter { display: none; }
+
+.chapter-hero {
+  padding: 24px 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.chapter-part-tag {
+  display: inline-flex; align-items: center;
+  font-size: 11px; font-weight: 600; letter-spacing: .06em;
+  text-transform: uppercase; padding: 3px 9px;
+  border-radius: 20px; margin-bottom: 10px;
+}
+.chapter-part-tag.theory { background: var(--part1-bg); color: var(--part1); }
+.chapter-part-tag.practice { background: var(--part2-bg); color: var(--part2); }
+
+.chapter-title {
+  font-size: 22px; font-weight: 700; line-height: 1.25;
+  color: var(--text); font-family: var(--font-body);
+  margin-bottom: 0;
+}
+
+.chapter-preview-block {
+  margin: 20px 16px;
+  background: var(--accent-light);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 14px 16px;
+}
+.chapter-preview-label {
+  font-size: 10px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 8px;
+}
+.chapter-preview-text {
+  font-family: var(--font-body);
+  font-size: 15px; line-height: 1.65; color: var(--text);
+  font-style: italic;
+}
+
+.chapter-body {
+  padding: 4px 16px 60px;
+  font-family: var(--font-body);
+  font-size: 16px; line-height: 1.75; color: var(--text);
+}
+.chapter-body p { margin-bottom: 1.1em; }
+.chapter-body h3 {
+  font-family: var(--font-ui);
+  font-size: 16px; font-weight: 700;
+  color: var(--text); margin: 1.8em 0 .6em;
+  line-height: 1.3;
+}
+.chapter-body h4 {
+  font-family: var(--font-ui);
+  font-size: 14px; font-weight: 600;
+  color: var(--text-soft); margin: 1.4em 0 .4em;
+  text-transform: uppercase; letter-spacing: .04em;
+}
+.chapter-body blockquote {
+  border-left: 3px solid var(--border);
+  padding: 2px 0 2px 16px; margin: 1.2em 0;
+  color: var(--text-soft);
+  font-style: italic;
+}
+.chapter-body ul, .chapter-body ol {
+  padding-left: 1.5em; margin-bottom: 1.1em;
+}
+.chapter-body li { margin-bottom: .5em; line-height: 1.65; }
+
+/* ── Reading Progress ── */
+.reading-progress {
+  position: fixed; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--accent);
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform .1s linear;
+  z-index: 200;
+  pointer-events: none;
+}
+
+/* ── Empty state ── */
+.toc-count {
+  font-size: 12px; color: var(--text-soft);
+  padding: 0 16px;
+  margin-bottom: 8px; margin-top: -4px;
+}
+
+/* ── Scroll ── */
+.view { overflow-y: auto; height: calc(100dvh - 53px); scroll-behavior: smooth; }
+
+/* ── Footnote cleanup ── */
+sup { font-size: .7em; }
+</style>
+</head>
+<body>
+<div class="reading-progress" id="reading-progress"></div>
+
+<div id="app">
+  <!-- Header -->
+  <header class="app-header">
+    <button class="header-back" id="btn-back" onclick="showTOC()" aria-label="Back to contents">
+      <svg width="8" height="13" viewBox="0 0 8 13" fill="none">
+        <path d="M7 1L1 6.5L7 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Contents
+    </button>
+    <h1 id="header-title">MBCT: Distinctive Features</h1>
+    <button class="btn-icon" id="btn-theme" onclick="toggleTheme()" aria-label="Toggle dark mode">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="theme-icon">
+        <circle cx="12" cy="12" r="4"/>
+        <line x1="12" y1="2" x2="12" y2="4"/>
+        <line x1="12" y1="20" x2="12" y2="22"/>
+        <line x1="4.93" y1="4.93" x2="6.34" y2="6.34"/>
+        <line x1="17.66" y1="17.66" x2="19.07" y2="19.07"/>
+        <line x1="2" y1="12" x2="4" y2="12"/>
+        <line x1="20" y1="12" x2="22" y2="12"/>
+        <line x1="4.93" y1="19.07" x2="6.34" y2="17.66"/>
+        <line x1="17.66" y1="6.34" x2="19.07" y2="4.93"/>
+      </svg>
+    </button>
+  </header>
+
+  <!-- TOC View -->
+  <div id="view-toc" class="view">
+    <div class="toc-hero">
+      <p style="font-size:15px;font-weight:600;color:var(--text);">Rebecca Crane</p>
+      <p>30 features across theory and practice — tap any feature to read.</p>
+    </div>
+
+    <!-- Part 1 -->
+    <div class="part-section part-1" id="part1-section">
+      <div class="part-label">Part 1 &mdash; Theoretical Features (1–15)</div>
+    </div>
+
+    <!-- Part 2 -->
+    <div class="part-section part-2" id="part2-section">
+      <div class="part-label">Part 2 &mdash; Practical Features (16–30)</div>
+    </div>
+  </div>
+
+  <!-- Chapter View -->
+  <div id="view-chapter" class="view">
+    <div class="chapter-hero" id="chapter-hero">
+      <div class="chapter-part-tag" id="chapter-tag">Theory</div>
+      <h2 class="chapter-title" id="chapter-title"></h2>
+    </div>
+    <div class="chapter-preview-block" id="chapter-preview-block">
+      <div class="chapter-preview-label">Opening passage</div>
+      <div class="chapter-preview-text" id="chapter-preview"></div>
+    </div>
+    <div class="chapter-body" id="chapter-body"></div>
+  </div>
+</div>
+
+<script src="chapters.js"></script>
+<script>
+/* ── Theme ── */
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+let isDark = localStorage.getItem('theme') === 'dark' ||
+             (!localStorage.getItem('theme') && prefersDark.matches);
+
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  document.getElementById('theme-meta').content = isDark ? '#1c1917' : '#4a7060';
+  const icon = document.getElementById('theme-icon');
+  if (isDark) {
+    icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor" stroke="none"/>';
+  } else {
+    icon.innerHTML = `<circle cx="12" cy="12" r="4"/>
+      <line x1="12" y1="2" x2="12" y2="4"/>
+      <line x1="12" y1="20" x2="12" y2="22"/>
+      <line x1="4.93" y1="4.93" x2="6.34" y2="6.34"/>
+      <line x1="17.66" y1="17.66" x2="19.07" y2="19.07"/>
+      <line x1="2" y1="12" x2="4" y2="12"/>
+      <line x1="20" y1="12" x2="22" y2="12"/>
+      <line x1="4.93" y1="19.07" x2="6.34" y2="17.66"/>
+      <line x1="17.66" y1="6.34" x2="19.07" y2="4.93"/>`;
+  }
+}
+
+function toggleTheme() {
+  isDark = !isDark;
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  applyTheme();
+}
+applyTheme();
+
+/* ── Render TOC ── */
+function renderTOC() {
+  const p1 = document.getElementById('part1-section');
+  const p2 = document.getElementById('part2-section');
+
+  CHAPTERS.forEach(ch => {
+    const card = document.createElement('div');
+    card.className = `feature-card part-${ch.part}`;
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('aria-label', `Feature ${ch.id}: ${ch.title}`);
+    card.onclick = () => showChapter(ch.id);
+    card.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') showChapter(ch.id); };
+
+    // Clean up preview: strip leading footnote refs, trim
+    let previewText = ch.preview
+      .replace(/^\s*\d{1,2}\s*\)\s*/, '')  // strip leading "25)"
+      .replace(/\d{1,2}$/, '')              // strip trailing footnote nums
+      .replace(/\n/g, ' ')
+      .trim()
+      .slice(0, 160);
+
+    card.innerHTML = `
+      <div class="feature-num">${ch.id}</div>
+      <div class="feature-info">
+        <div class="feature-title">${escHtml(ch.title)}</div>
+        <div class="feature-preview">${escHtml(previewText)}</div>
+      </div>
+      <svg class="card-arrow" width="7" height="12" viewBox="0 0 7 12" fill="none">
+        <path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`;
+
+    (ch.part === 1 ? p1 : p2).appendChild(card);
+  });
+}
+
+/* ── Render chapter body text ── */
+function renderBody(text) {
+  // Split into paragraphs
+  const paras = text.split('\n\n');
+  let html = '';
+  let inList = false;
+
+  for (let i = 0; i < paras.length; i++) {
+    const raw = paras[i].trim();
+    if (!raw) continue;
+
+    // Single-line para with no trailing period and short = section header
+    const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+    const joined = lines.join(' ');
+
+    // Detect bullet list block (lines starting with ·)
+    if (raw.includes('\n·') || raw.startsWith('·')) {
+      const items = raw.split(/\n?·/).filter(s => s.trim());
+      html += '<ul>' + items.map(s => `<li>${escHtml(s.replace(/\n/g, ' ').trim())}</li>`).join('') + '</ul>';
+      continue;
+    }
+
+    // Detect standalone citation / parenthetical (short, no sentence structure)
+    if (lines.length === 1 && joined.length < 80 && /^\(/.test(joined)) {
+      html += `<p style="color:var(--text-soft);font-size:.92em;margin-top:-.5em">${escHtml(joined)}</p>`;
+      continue;
+    }
+
+    // Detect section heading: short (< 80 chars), no trailing sentence punct, not a list
+    const isSectionHeader = joined.length < 90 &&
+      !joined.endsWith('.') && !joined.endsWith('?') && !joined.endsWith(':') &&
+      !joined.endsWith(')') &&
+      !/^[·\d]/.test(joined[0]) &&
+      lines.length <= 3 &&
+      // Must look like a heading (starts with capital)
+      /^[A-Z"']/.test(joined);
+
+    if (isSectionHeader) {
+      html += `<h3>${escHtml(joined)}</h3>`;
+      continue;
+    }
+
+    // Regular paragraph — join soft-wrapped lines
+    const paraText = lines.join(' ');
+
+    // Detect block quotes: short italicized passages with attribution in parens
+    const isQuote = (joined.match(/\(.*?\d{4}.*?\)/) || joined.match(/\([A-Z][a-z]+,/)) &&
+                    joined.length < 400 && lines.length < 8;
+
+    if (isQuote) {
+      html += `<blockquote><p>${escHtml(paraText)}</p></blockquote>`;
+      continue;
+    }
+
+    html += `<p>${escHtml(paraText)}</p>`;
+  }
+
+  return html;
+}
+
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+/* ── Navigation ── */
+let currentChapterId = null;
+
+function showChapter(id) {
+  const ch = CHAPTERS.find(c => c.id === id);
+  if (!ch) return;
+  currentChapterId = id;
+
+  // Update header
+  document.getElementById('btn-back').classList.add('visible');
+  document.getElementById('header-title').textContent = `Feature ${ch.id}`;
+
+  // Fill in chapter content
+  const tag = document.getElementById('chapter-tag');
+  tag.textContent = ch.part === 1 ? 'Theory' : 'Practice';
+  tag.className = 'chapter-part-tag ' + (ch.part === 1 ? 'theory' : 'practice');
+
+  document.getElementById('chapter-title').textContent = ch.title;
+
+  // Preview (opening passage)
+  let preview = ch.preview
+    .replace(/^\s*\d{1,2}\s*\)\s*/, '')
+    .replace(/\n/g, ' ')
+    .trim();
+  document.getElementById('chapter-preview').textContent = preview;
+
+  // Body: render the full text, skipping the preview sentence if it appears at the top
+  let body = ch.body;
+  // Strip chapter title text from start of body if it appears there
+  const titleAlpha = ch.title.toLowerCase().replace(/[^a-z]/g, '');
+  const bodyAlpha  = body.toLowerCase().replace(/[^a-z]/g, '');
+  let bodyStart = 0;
+  if (bodyAlpha.startsWith(titleAlpha.slice(0, Math.min(20, titleAlpha.length)))) {
+    let matched = 0;
+    for (let i = 0; i < body.length && matched < titleAlpha.length; i++) {
+      if (/[a-zA-Z]/.test(body[i])) matched++;
+      bodyStart = i + 1;
+    }
+  }
+  body = body.slice(bodyStart).trim();
+
+  document.getElementById('chapter-body').innerHTML = renderBody(body);
+
+  // Switch views
+  document.getElementById('view-toc').style.display = 'none';
+  const cv = document.getElementById('view-chapter');
+  cv.style.display = 'block';
+  cv.scrollTop = 0;
+
+  // Progress bar
+  cv.onscroll = updateProgress;
+  updateProgress();
+
+  // Update URL without reload
+  history.pushState({ chapterId: id }, '', `#feature-${id}`);
+}
+
+function showTOC() {
+  currentChapterId = null;
+  document.getElementById('btn-back').classList.remove('visible');
+  document.getElementById('header-title').textContent = 'MBCT: Distinctive Features';
+  document.getElementById('view-chapter').style.display = 'none';
+  document.getElementById('view-toc').style.display = 'block';
+  document.getElementById('reading-progress').style.transform = 'scaleX(0)';
+  history.pushState({}, '', '#');
+}
+
+function updateProgress() {
+  const cv = document.getElementById('view-chapter');
+  const progress = cv.scrollTop / (cv.scrollHeight - cv.clientHeight) || 0;
+  document.getElementById('reading-progress').style.transform = `scaleX(${progress})`;
+}
+
+// Handle browser back
+window.addEventListener('popstate', (e) => {
+  if (e.state && e.state.chapterId) {
+    showChapter(e.state.chapterId);
+  } else {
+    showTOC();
+  }
+});
+
+// Handle direct URL with hash
+function handleHash() {
+  const m = location.hash.match(/^#feature-(\d+)$/);
+  if (m) showChapter(parseInt(m[1]));
+}
+
+/* ── Init ── */
+renderTOC();
+handleHash();
+
+/* ── Service Worker ── */
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
