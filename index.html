@@ -141,41 +141,42 @@ body {
 }
 
 .teachings-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  display: flex; flex-direction: column; gap: 8px;
 }
-.teachings-grid.single { grid-template-columns: 1fr; }
 
 .teaching-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 14px 28px 14px 14px;
+  padding: 14px 36px 14px 14px;
   cursor: pointer;
   box-shadow: var(--shadow-card);
   transition: background .15s, transform .1s;
   -webkit-tap-highlight-color: transparent;
-  display: flex; flex-direction: column; gap: 5px;
   position: relative;
 }
 .teaching-card:active { transform: scale(0.97); }
 
+.teaching-card-header {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+}
 .teaching-tag {
   font-size: 10px; font-weight: 700; letter-spacing: .07em;
   text-transform: uppercase; color: var(--accent);
+  background: var(--accent-light); border-radius: 20px;
+  padding: 2px 8px; white-space: nowrap; flex-shrink: 0;
 }
 .teaching-title {
-  font-size: 14px; font-weight: 700; line-height: 1.3; color: var(--text);
+  font-size: 15px; font-weight: 700; line-height: 1.3; color: var(--text);
 }
 .teaching-card-quote {
-  font-size: 12px; line-height: 1.5; color: var(--text-soft);
+  font-size: 13px; line-height: 1.6; color: var(--text-soft);
   font-family: var(--font-body); font-style: italic;
-  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
-  overflow: hidden; margin-top: 2px;
+  display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .teaching-arrow {
-  position: absolute; right: 10px; top: 14px;
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
   color: var(--border);
 }
 
@@ -299,17 +300,24 @@ body {
 .expand-btn:hover { background: var(--border); }
 
 .teaching-more { display: none; }
-.teaching-more.open {
-  display: block;
-  padding: 0 16px;
+.teaching-more.open { display: block; }
+
+/* Sentence-list layout used in both passage body and expanded section */
+.insight-list { padding: 8px 16px 4px; }
+.insight-section-label {
+  font-size: 10px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--text-soft);
+  padding: 14px 0 4px;
+}
+.insight-item {
+  padding: 11px 0;
+  border-bottom: 1px solid var(--border);
   font-family: var(--font-body);
-  font-size: 16.5px; line-height: 1.78; color: var(--text);
+  font-size: 16px; line-height: 1.7;
+  color: var(--text);
 }
-.teaching-more.open p { margin-bottom: 1.1em; }
-.teaching-more.open h3 {
-  font-family: var(--font-ui); font-size: 16px; font-weight: 700;
-  color: var(--text); margin: 1.8em 0 .6em; line-height: 1.3;
-}
+.insight-item:last-child { border-bottom: none; }
+.insight-item.dim { color: var(--text-soft); font-style: italic; font-size: 14px; }
 
 .full-chapter-link {
   display: flex; align-items: center; justify-content: space-between;
@@ -630,6 +638,86 @@ function renderParas(text) {
   return html;
 }
 
+/* ═══ SENTENCE LIST RENDERER ═══ */
+function sentenceSplit(flat) {
+  // Split at [.!?] followed by space+capital — but not at single-letter abbreviations (M., A., F.)
+  const raw = [];
+  let rem = flat.trim();
+  while (rem.length > 5) {
+    // Negative lookbehind: don't break after a lone capital or lowercase letter preceded by space
+    // This prevents splitting "M. A." or "F. A." or "p. 105"
+    const m = rem.match(/^(.+?(?<!\s[A-Za-z])[.!?])(?=\s+[A-Z"'(]|\s*$)/);
+    if (!m || m[1].length > rem.length * 0.92) {
+      if (rem.length > 5) raw.push(rem);
+      break;
+    }
+    raw.push(m[1].trim());
+    rem = rem.slice(m[1].length).trim();
+  }
+  // Merge fragments shorter than 20 chars back with previous sentence
+  const merged = [];
+  for (const s of raw) {
+    if (s.length < 20 && merged.length > 0 && !/[!?]$/.test(s)) {
+      merged[merged.length - 1] += ' ' + s;
+    } else {
+      merged.push(s);
+    }
+  }
+  return merged.filter(s => s.length > 10);
+}
+
+function isJunk(s) {
+  if (s.length < 14 && !/[!?]$/.test(s)) return true;
+  if (/Holistic Health|Hyperion|Davis Company|Flamingo|Plume|Routledge/.test(s)) return true;
+  if (/^\d+\s+[A-Z][a-z]+,?\s+\d{4}/.test(s)) return true; // footnote "4 From..."
+  return false;
+}
+
+function renderSentenceList(text, sectionLabel) {
+  if (!text || !text.trim()) return '';
+  const paras = text.split('\n\n').filter(p => p.trim());
+  let items = [];
+
+  if (sectionLabel) items.push({ type: 'label', text: sectionLabel });
+
+  for (const para of paras) {
+    const flat = para.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!flat || flat.length < 10) continue;
+
+    // Skip footnote lines (digit + text, or reference-like)
+    if (/^\d+\s[A-Z]/.test(flat) && flat.length < 200) continue;
+
+    // Detect inline section heading (first line short + no sentence punct + remaining body)
+    const rawLines = para.split('\n').map(l => l.trim()).filter(Boolean);
+    if (rawLines.length >= 2) {
+      const fst = rawLines[0];
+      if (fst.length < 80 && !/[.!?]$/.test(fst) && /^[A-Z"']/.test(fst)) {
+        items.push({ type: 'label', text: fst });
+        const body = rawLines.slice(1).join(' ');
+        sentenceSplit(body).filter(s => !isJunk(s)).forEach(s => items.push({ type: 'item', text: s }));
+        continue;
+      }
+    }
+
+    // Standalone short heading
+    if (flat.length < 90 && !/[.!?]$/.test(flat) && /^[A-Z"']/.test(flat) && !/^[·\d]/.test(flat)) {
+      items.push({ type: 'label', text: flat });
+      continue;
+    }
+
+    // Regular paragraph → split into sentences, skip junk
+    sentenceSplit(flat).filter(s => !isJunk(s)).forEach(s => items.push({ type: 'item', text: s }));
+  }
+
+  if (!items.length) return '';
+  // Returns inner HTML without container — callers wrap in <div class="insight-list">
+  return items.map(item =>
+    item.type === 'label'
+      ? `<div class="insight-section-label">${escHtml(item.text)}</div>`
+      : `<div class="insight-item">${escHtml(item.text)}</div>`
+  ).join('');
+}
+
 /* ═══ PASSAGE SPLIT ═══ */
 function splitPassage(keyText) {
   // Extracts the first complete sentence from a passage block.
@@ -670,7 +758,7 @@ function extractPassage(chapterId, startPhrase, count) {
   const all = [firstPara, ...paras.slice(idx + 1)];
   return {
     key: all.slice(0, count).join('\n\n'),
-    more: all.slice(count, count + 8).join('\n\n')
+    more: all.slice(count, count + 5).join('\n\n')
   };
 }
 
@@ -724,8 +812,10 @@ function makeTeachingCard(t) {
   card.onclick = () => showTeaching(t.id);
   card.onkeydown = e => { if (e.key==='Enter'||e.key===' ') showTeaching(t.id); };
   card.innerHTML = `
-    <div class="teaching-tag">Feature ${t.chapterId}</div>
-    <div class="teaching-title">${escHtml(t.title)}</div>
+    <div class="teaching-card-header">
+      <div class="teaching-tag">Feature ${t.chapterId}</div>
+      <div class="teaching-title">${escHtml(t.title)}</div>
+    </div>
     <div class="teaching-card-quote">${escHtml(quote)}</div>
     <svg class="teaching-arrow" width="7" height="11" viewBox="0 0 7 11" fill="none">
       <path d="M1 1l4.5 4.5L1 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -752,7 +842,7 @@ function renderTeachings() {
     }
 
     const grid = document.createElement('div');
-    grid.className = 'teachings-grid' + (group.ids.length === 1 ? ' single' : '');
+    grid.className = 'teachings-grid';
     group.ids.forEach(id => {
       const t = KEY_TEACHINGS.find(x => x.id === id);
       if (t) grid.appendChild(makeTeachingCard(t));
@@ -809,10 +899,24 @@ function showTeaching(id, push = true) {
   const { quote, rest } = splitPassage(key);
 
   document.getElementById('pull-quote').textContent = quote;
-  document.getElementById('teaching-passage').innerHTML = rest ? renderParas(rest) : '';
 
+  // Level 1: up to 4 clean sentences from the passage body
+  const restSentences = rest.split('\n\n').filter(p => p.trim())
+    .flatMap(p => sentenceSplit(p.replace(/\n/g,' ').replace(/\s+/g,' ').trim()).filter(s => !isJunk(s)));
+  const bodyItems = restSentences.slice(0, 4);
+  const overflowItems = restSentences.slice(4);
+
+  document.getElementById('teaching-passage').innerHTML = bodyItems.length
+    ? '<div class="insight-list">' + bodyItems.map(s => `<div class="insight-item">${escHtml(s)}</div>`).join('') + '</div>'
+    : '';
+
+  // Level 2: overflow sentences + more paragraphs, all in one insight-list
   const moreEl = document.getElementById('teaching-more');
-  moreEl.innerHTML = renderParas(more);
+  const moreInner = [
+    ...overflowItems.map(s => `<div class="insight-item">${escHtml(s)}</div>`),
+    more.trim() ? `<div class="insight-section-label">More from the chapter</div>${renderSentenceList(more)}` : ''
+  ].join('');
+  moreEl.innerHTML = moreInner ? `<div class="insight-list">${moreInner}</div>` : '';
   moreEl.classList.remove('open');
   document.getElementById('expand-btn').textContent = 'Read more';
 
