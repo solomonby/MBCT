@@ -113,39 +113,51 @@ body {
 .toc-hero .book-title { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
 .toc-hero .book-author { font-size: 13px; color: var(--text-soft); }
 
-/* ── Journey sections (home screen) ── */
-.journey-section {
-  padding: 22px 16px 0;
+/* ── Narrative section ── */
+.narrative-section {
+  padding: 22px 16px 20px;
+  border-bottom: 1px solid var(--border);
 }
-.journey-section + .journey-section {
-  border-top: 1px solid var(--border);
-}
-.journey-badge {
+.section-eyebrow {
   display: block;
   font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
-  color: var(--accent); margin-bottom: 5px;
+  color: var(--text-soft); margin-bottom: 16px;
 }
-.journey-section-title {
-  font-size: 19px; font-weight: 700; color: var(--text);
-  line-height: 1.25; margin-bottom: 12px;
+.narrative-sentence {
+  font-family: var(--font-body); font-size: 15px; line-height: 1.8;
+  color: var(--text); padding: 12px 0;
+  border-bottom: 1px solid var(--border);
 }
-.journey-section-quote {
-  font-size: 14px; line-height: 1.65; color: var(--text-soft);
-  font-family: var(--font-body); font-style: italic;
-  padding-left: 12px; border-left: 2px solid var(--border);
-  margin-bottom: 4px;
-}
-.journey-items { margin-bottom: 8px; }
-.journey-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 13px 0; border-bottom: 1px solid var(--border);
+.narrative-sentence:first-of-type { padding-top: 0; }
+.narrative-sentence:last-of-type { border-bottom: none; padding-bottom: 0; }
+
+/* ── Action plan section ── */
+.action-section { padding: 22px 16px 12px; }
+.action-step {
+  display: flex; gap: 14px; margin-bottom: 26px;
   cursor: pointer; -webkit-tap-highlight-color: transparent;
-  transition: opacity .15s;
 }
-.journey-item:last-child { border-bottom: none; }
-.journey-item:active { opacity: 0.55; }
-.journey-item-title {
-  flex: 1; font-size: 15px; font-weight: 600; color: var(--text);
+.action-step:last-child { margin-bottom: 0; }
+.action-step:active .action-content { opacity: 0.6; }
+.action-num {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--accent-light); color: var(--accent);
+  font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 2px;
+}
+.action-content { flex: 1; min-width: 0; }
+.action-title {
+  font-size: 15px; font-weight: 700; color: var(--text);
+  line-height: 1.3; margin-bottom: 8px;
+}
+.action-quote {
+  font-family: var(--font-body); font-size: 14px; line-height: 1.72;
+  color: var(--text-soft); font-style: italic; margin-bottom: 8px;
+}
+.action-more {
+  font-size: 12px; font-weight: 600; color: var(--accent);
+  display: inline-flex; align-items: center; gap: 3px;
 }
 
 /* ── All Features section (TOC) ── */
@@ -509,48 +521,40 @@ const KEY_TEACHINGS = [
   },
 ];
 
-const JOURNEY = [
+/* ── The four key sentences that tell the MBCT story ── */
+const NARRATIVE = [
+  'Mindfulness is the awareness that emerges when we pay attention to experience in a particular way: on purpose, in the present moment, and nonjudgementally.',
+  'Doing mode is primarily a conceptual, thought-based mode of processing experience: we are ‘thinking about’ rather than ‘being with’ our direct experience. The thoughts that are the ‘currency’ of this mode of mind become our reality.',
+  'Rumination is an attempt to address difficult emotions through a process of analysis and problem solving. The interconnected relapse-related processes of ruminative thinking and experiential avoidance arise out of and are perpetuated by the activities of the doing mode of mind.',
+  'The shift towards a more mindful mode of being, which involves both acceptance and paying attention to the actuality of the present moment, enables participants to access new ways to process or ‘be with’ depression-related and other aspects of experience.',
+];
+
+/* ── Five concrete steps for difficult moments ── */
+const ACTION_STEPS = [
   {
-    badge: 'Foundation',
-    title: 'What mindfulness is',
-    quote: '"Mindfulness is the awareness that emerges when we pay attention to experience in a particular way: on purpose, in the present moment, and nonjudgementally."',
-    ids: ['mindfulness']
+    title: 'Notice you’re in doing mode',
+    quote: 'A key intention of the programme is to enable participants to recognise the mode of mind that they are in, and to be able to intentionally shift from one mode to another.',
+    teachingId: 'automatic-pilot'
   },
   {
-    badge: 'Step 1',
-    title: 'The autopilot mind',
-    quote: '"An essential premise of MBCT is that the mind has two broad modes through which experience can be processed—doing mode and being mode."',
-    ids: ['automatic-pilot', 'doing-mode']
+    title: 'Shift — use the body or breath',
+    quote: 'The ability to “wake up” while in the midst of things in daily life can take the form of a momentary sense of awareness of the sensations of the feet on the floor or of the breath. In that moment, instead of being caught up with whatever mind state predominates we change perspective.',
+    teachingId: 'being-mode'
   },
   {
-    badge: 'Step 2',
-    title: 'How suffering perpetuates',
-    quote: '"The interconnected relapse-related processes of ruminative thinking and experiential avoidance arise out of and are perpetuated by the activities of the doing mode of mind."',
-    ids: ['rumination', 'avoidance']
+    title: 'Turn towards, not away',
+    quote: 'We are learning to be present with and acceptant of pleasant, unpleasant and neutral experience—developing an even-handedness towards our experience. We learn to be tender, gentle, kindly, compassionate and respectful towards ourselves and our experience.',
+    teachingId: 'acceptance'
   },
   {
-    badge: 'Step 3',
-    title: 'Shifting into being mode',
-    quote: '"The ability to \'wake up\' while in the midst of things in daily life can take the form of a momentary sense of awareness of the sensations of the feet on the floor or of the breath. In that moment, instead of being caught up with whatever mind state predominates we change perspective; an opportunity has opened up to think and act differently."',
-    ids: ['being-mode', 'body']
+    title: 'Let thoughts be thoughts',
+    quote: 'The invitation is to designate another focus of attention such as the breath to anchor the attention into the present moment. We note the thoughts as they arise, and then let go of them, returning to the primary focus of attention on the breath. This is done with a sense of kindliness and gentleness but also with persistence and firmness.',
+    teachingId: 'decentring'
   },
   {
-    badge: 'Step 4',
-    title: 'Turning towards difficulty',
-    quote: '"It engages us in a turning toward (opening to) rather than a turning away (closing down) from present-moment experience. There is an aim to cultivate a willingness to let things be as they are as we become aware of them whether we like them or not."',
-    ids: ['acceptance']
-  },
-  {
-    badge: 'Step 5',
-    title: 'Seeing thoughts as thoughts',
-    quote: '"At the heart of mindfulness practice is a paradox: it encourages full engagement with our lives while simultaneously stepping back and observing what is going on. Negative experiencing is not pushed away or made into our \'enemy\', but rather we befriend our experience by \'acknowledging and letting be\' and \'turning towards and directly experiencing\'."',
-    ids: ['decentring']
-  },
-  {
-    badge: 'Step 6',
-    title: 'Awareness as ground',
-    quote: '"The awareness of our experience is not the experience itself: the awareness of depression is not depressed; the awareness of pain is not itself in pain. We are able to be with this experience, see around it and see it in a wider context."',
-    ids: ['awareness']
+    title: 'Rest in awareness',
+    quote: 'The awareness of our experience is not the experience itself: the awareness of depression is not depressed; the awareness of pain is not itself in pain. We are able to be with this experience, see around it and see it in a wider context.',
+    teachingId: 'awareness'
   },
 ];
 
@@ -792,49 +796,64 @@ function toggleTOC() {
   toggle.setAttribute('aria-expanded', isOpen);
 }
 
-/* ═══ JOURNEY RENDER ═══ */
-function renderJourney() {
+/* ═══ HOME CONTENT RENDER ═══ */
+function renderHomeContent() {
   const container = document.getElementById('teachings-container');
-  JOURNEY.forEach(step => {
-    const section = document.createElement('div');
-    section.className = 'journey-section';
 
-    const badge = document.createElement('span');
-    badge.className = 'journey-badge';
-    badge.textContent = step.badge;
-    section.appendChild(badge);
+  // Part 1: The philosophy — four connected sentences
+  const narrativeSec = document.createElement('div');
+  narrativeSec.className = 'narrative-section';
 
-    const title = document.createElement('div');
-    title.className = 'journey-section-title';
-    title.textContent = step.title;
-    section.appendChild(title);
+  const narrativeEyebrow = document.createElement('span');
+  narrativeEyebrow.className = 'section-eyebrow';
+  narrativeEyebrow.textContent = 'The philosophy';
+  narrativeSec.appendChild(narrativeEyebrow);
 
-    const quote = document.createElement('div');
-    quote.className = 'journey-section-quote';
-    quote.textContent = step.quote;
-    section.appendChild(quote);
-
-    const items = document.createElement('div');
-    items.className = 'journey-items';
-    step.ids.forEach(id => {
-      const t = KEY_TEACHINGS.find(x => x.id === id);
-      if (!t) return;
-      const item = document.createElement('div');
-      item.className = 'journey-item';
-      item.setAttribute('role', 'button');
-      item.setAttribute('tabindex', '0');
-      item.onclick = () => showTeaching(t.id);
-      item.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') showTeaching(t.id); };
-      item.innerHTML = `
-        <div class="journey-item-title">${escHtml(t.title)}</div>
-        <svg width="7" height="11" viewBox="0 0 7 11" fill="none">
-          <path d="M1 1l4.5 4.5L1 10" stroke="var(--text-soft)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>`;
-      items.appendChild(item);
-    });
-    section.appendChild(items);
-    container.appendChild(section);
+  NARRATIVE.forEach(text => {
+    const p = document.createElement('div');
+    p.className = 'narrative-sentence';
+    p.textContent = text;
+    narrativeSec.appendChild(p);
   });
+  container.appendChild(narrativeSec);
+
+  // Part 2: Action plan — five numbered steps for difficult moments
+  const actionSec = document.createElement('div');
+  actionSec.className = 'action-section';
+
+  const actionEyebrow = document.createElement('span');
+  actionEyebrow.className = 'section-eyebrow';
+  actionEyebrow.textContent = 'When difficult emotions arise';
+  actionSec.appendChild(actionEyebrow);
+
+  ACTION_STEPS.forEach((step, i) => {
+    const row = document.createElement('div');
+    row.className = 'action-step';
+    row.setAttribute('role', 'button');
+    row.setAttribute('tabindex', '0');
+    row.onclick = () => showTeaching(step.teachingId);
+    row.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') showTeaching(step.teachingId); };
+
+    const numEl = document.createElement('div');
+    numEl.className = 'action-num';
+    numEl.textContent = i + 1;
+
+    const content = document.createElement('div');
+    content.className = 'action-content';
+    content.innerHTML = `
+      <div class="action-title">${escHtml(step.title)}</div>
+      <div class="action-quote">${escHtml(step.quote)}</div>
+      <span class="action-more">Read more
+        <svg width="6" height="10" viewBox="0 0 6 10" fill="none">
+          <path d="M1 1l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>`;
+
+    row.appendChild(numEl);
+    row.appendChild(content);
+    actionSec.appendChild(row);
+  });
+  container.appendChild(actionSec);
 }
 
 /* ═══ FEATURE CARDS (TOC) ═══ */
@@ -963,7 +982,7 @@ window.addEventListener('popstate', e => {
 });
 
 /* ═══ INIT ═══ */
-renderJourney();
+renderHomeContent();
 renderFeatureCards();
 renderHome();
 
