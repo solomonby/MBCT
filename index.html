@@ -113,71 +113,39 @@ body {
 .toc-hero .book-title { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
 .toc-hero .book-author { font-size: 13px; color: var(--text-soft); }
 
-/* ── Key Teachings section ── */
-.section-header {
-  padding: 20px 16px 10px;
-  display: flex; align-items: baseline; gap: 8px;
+/* ── Journey sections (home screen) ── */
+.journey-section {
+  padding: 22px 16px 0;
 }
-.section-header h2 { font-size: 18px; font-weight: 700; }
-.section-header span { font-size: 12px; color: var(--text-soft); }
-
-.teachings-group {
-  padding: 0 16px;
-  margin-bottom: 20px;
-}
-.teachings-group-label {
-  font-size: 11px; font-weight: 700; letter-spacing: .08em;
-  text-transform: uppercase; color: var(--accent);
-  padding: 14px 0 6px;
+.journey-section + .journey-section {
   border-top: 1px solid var(--border);
 }
-.teachings-group:first-child .teachings-group-label {
-  border-top: none; padding-top: 0;
+.journey-badge {
+  display: block;
+  font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 5px;
 }
-.teachings-group-desc {
-  font-size: 13.5px; line-height: 1.55; color: var(--text-soft);
+.journey-section-title {
+  font-size: 19px; font-weight: 700; color: var(--text);
+  line-height: 1.25; margin-bottom: 12px;
+}
+.journey-section-quote {
+  font-size: 14px; line-height: 1.65; color: var(--text-soft);
   font-family: var(--font-body); font-style: italic;
-  padding-bottom: 12px;
+  padding-left: 12px; border-left: 2px solid var(--border);
+  margin-bottom: 4px;
 }
-
-.teachings-grid {
-  display: flex; flex-direction: column; gap: 8px;
+.journey-items { margin-bottom: 8px; }
+.journey-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 13px 0; border-bottom: 1px solid var(--border);
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: opacity .15s;
 }
-
-.teaching-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 14px 36px 14px 14px;
-  cursor: pointer;
-  box-shadow: var(--shadow-card);
-  transition: background .15s, transform .1s;
-  -webkit-tap-highlight-color: transparent;
-  position: relative;
-}
-.teaching-card:active { transform: scale(0.97); }
-
-.teaching-card-header {
-  display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
-}
-.teaching-tag {
-  font-size: 10px; font-weight: 700; letter-spacing: .07em;
-  text-transform: uppercase; color: var(--accent);
-  background: var(--accent-light); border-radius: 20px;
-  padding: 2px 8px; white-space: nowrap; flex-shrink: 0;
-}
-.teaching-title {
-  font-size: 15px; font-weight: 700; line-height: 1.3; color: var(--text);
-}
-.teaching-card-quote {
-  font-size: 13px; line-height: 1.6; color: var(--text-soft);
-  font-family: var(--font-body); font-style: italic;
-  display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.teaching-arrow {
-  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-  color: var(--border);
+.journey-item:last-child { border-bottom: none; }
+.journey-item:active { opacity: 0.55; }
+.journey-item-title {
+  flex: 1; font-size: 15px; font-weight: 600; color: var(--text);
 }
 
 /* ── All Features section (TOC) ── */
@@ -406,10 +374,7 @@ body {
       <div class="book-author">Distinctive Features &nbsp;·&nbsp; Rebecca Crane</div>
     </div>
 
-    <!-- Key Teachings -->
-    <div class="section-header">
-      <h2>Key Teachings</h2>
-    </div>
+    <!-- Journey sections -->
     <div id="teachings-container"></div>
 
     <!-- All Features (collapsible) -->
@@ -544,21 +509,36 @@ const KEY_TEACHINGS = [
   },
 ];
 
-const TEACHING_GROUPS = [
+const JOURNEY = [
   {
-    label: 'The foundation',
-    desc: '"Mindfulness is the awareness that emerges when we pay attention to experience in a particular way: on purpose, in the present moment, and nonjudgementally."',
+    badge: 'Foundation',
+    title: 'What mindfulness is',
+    quote: '"Mindfulness is the awareness that emerges when we pay attention to experience in a particular way: on purpose, in the present moment, and nonjudgementally."',
     ids: ['mindfulness']
   },
   {
-    label: 'How suffering arises',
-    desc: '"The interconnected relapse-related processes of ruminative thinking and experiential avoidance arise out of and are perpetuated by the activities of the doing mode of mind."',
-    ids: ['automatic-pilot', 'doing-mode', 'rumination', 'avoidance']
+    badge: 'Step 1',
+    title: 'The autopilot mind',
+    quote: '"An essential premise of MBCT is that the mind has two broad modes through which experience can be processed—doing mode and being mode."',
+    ids: ['automatic-pilot', 'doing-mode']
   },
   {
-    label: 'The way through',
-    desc: '"The shift towards a more mindful mode of being enables participants to access new ways to process or \'be with\' depression-related and other aspects of experience."',
-    ids: ['being-mode', 'body', 'acceptance', 'decentring', 'awareness']
+    badge: 'Step 2',
+    title: 'How suffering perpetuates',
+    quote: '"The interconnected relapse-related processes of ruminative thinking and experiential avoidance arise out of and are perpetuated by the activities of the doing mode of mind."',
+    ids: ['rumination', 'avoidance']
+  },
+  {
+    badge: 'Step 3',
+    title: 'A different mode of being',
+    quote: '"The shift towards a more mindful mode of being enables participants to access new ways to process or \'be with\' depression-related and other aspects of experience."',
+    ids: ['being-mode', 'body']
+  },
+  {
+    badge: 'Step 4',
+    title: 'A new relationship with experience',
+    quote: '"The possibility of learning to be in a different relationship to these times opens the potential for the experience to feel profoundly different."',
+    ids: ['acceptance', 'decentring', 'awareness']
   },
 ];
 
@@ -800,54 +780,47 @@ function toggleTOC() {
   toggle.setAttribute('aria-expanded', isOpen);
 }
 
-/* ═══ TEACHING CARDS ═══ */
-function makeTeachingCard(t) {
-  const { key } = extractPassage(t.chapterId, t.startPhrase, t.paragraphs);
-  const { quote } = splitPassage(key);
-
-  const card = document.createElement('div');
-  card.className = 'teaching-card';
-  card.setAttribute('role','button');
-  card.setAttribute('tabindex','0');
-  card.onclick = () => showTeaching(t.id);
-  card.onkeydown = e => { if (e.key==='Enter'||e.key===' ') showTeaching(t.id); };
-  card.innerHTML = `
-    <div class="teaching-card-header">
-      <div class="teaching-tag">Feature ${t.chapterId}</div>
-      <div class="teaching-title">${escHtml(t.title)}</div>
-    </div>
-    <div class="teaching-card-quote">${escHtml(quote)}</div>
-    <svg class="teaching-arrow" width="7" height="11" viewBox="0 0 7 11" fill="none">
-      <path d="M1 1l4.5 4.5L1 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>`;
-  return card;
-}
-
-function renderTeachings() {
+/* ═══ JOURNEY RENDER ═══ */
+function renderJourney() {
   const container = document.getElementById('teachings-container');
-  TEACHING_GROUPS.forEach(group => {
+  JOURNEY.forEach(step => {
     const section = document.createElement('div');
-    section.className = 'teachings-group';
+    section.className = 'journey-section';
 
-    const label = document.createElement('div');
-    label.className = 'teachings-group-label';
-    label.textContent = group.label;
-    section.appendChild(label);
+    const badge = document.createElement('span');
+    badge.className = 'journey-badge';
+    badge.textContent = step.badge;
+    section.appendChild(badge);
 
-    if (group.desc) {
-      const desc = document.createElement('div');
-      desc.className = 'teachings-group-desc';
-      desc.textContent = group.desc;
-      section.appendChild(desc);
-    }
+    const title = document.createElement('div');
+    title.className = 'journey-section-title';
+    title.textContent = step.title;
+    section.appendChild(title);
 
-    const grid = document.createElement('div');
-    grid.className = 'teachings-grid';
-    group.ids.forEach(id => {
+    const quote = document.createElement('div');
+    quote.className = 'journey-section-quote';
+    quote.textContent = step.quote;
+    section.appendChild(quote);
+
+    const items = document.createElement('div');
+    items.className = 'journey-items';
+    step.ids.forEach(id => {
       const t = KEY_TEACHINGS.find(x => x.id === id);
-      if (t) grid.appendChild(makeTeachingCard(t));
+      if (!t) return;
+      const item = document.createElement('div');
+      item.className = 'journey-item';
+      item.setAttribute('role', 'button');
+      item.setAttribute('tabindex', '0');
+      item.onclick = () => showTeaching(t.id);
+      item.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') showTeaching(t.id); };
+      item.innerHTML = `
+        <div class="journey-item-title">${escHtml(t.title)}</div>
+        <svg width="7" height="11" viewBox="0 0 7 11" fill="none">
+          <path d="M1 1l4.5 4.5L1 10" stroke="var(--text-soft)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>`;
+      items.appendChild(item);
     });
-    section.appendChild(grid);
+    section.appendChild(items);
     container.appendChild(section);
   });
 }
@@ -978,7 +951,7 @@ window.addEventListener('popstate', e => {
 });
 
 /* ═══ INIT ═══ */
-renderTeachings();
+renderJourney();
 renderFeatureCards();
 renderHome();
 
