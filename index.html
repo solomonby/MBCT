@@ -121,12 +121,26 @@ body {
 .section-header h2 { font-size: 18px; font-weight: 700; }
 .section-header span { font-size: 12px; color: var(--text-soft); }
 
-.teachings-grid {
+.teachings-group {
   padding: 0 16px;
+  margin-bottom: 16px;
+}
+.teachings-group-label {
+  font-size: 11px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--text-soft);
+  padding: 10px 0 10px;
+  border-top: 1px solid var(--border);
+}
+.teachings-group:first-child .teachings-group-label {
+  border-top: none; padding-top: 0;
+}
+
+.teachings-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
+.teachings-grid.single { grid-template-columns: 1fr; }
 
 .teaching-card {
   background: var(--bg-card);
@@ -361,9 +375,8 @@ body {
     <!-- Key Teachings -->
     <div class="section-header">
       <h2>Key Teachings</h2>
-      <span>Tap to read</span>
     </div>
-    <div class="teachings-grid" id="teachings-grid"></div>
+    <div id="teachings-container"></div>
 
     <!-- All Features (collapsible) -->
     <div class="toc-toggle" onclick="toggleTOC()" role="button" aria-expanded="false" id="toc-toggle">
@@ -429,70 +442,85 @@ const KEY_TEACHINGS = [
     title: 'What mindfulness is',
     chapterId: 1,
     startPhrase: 'Mindfulness is the awareness that emerges when we pay attention',
-    paragraphs: 3
+    paragraphs: 1
   },
   {
     id: 'automatic-pilot',
     title: 'Automatic pilot',
-    chapterId: 4,
-    startPhrase: 'describes a state of mind in which one acts without conscious intention',
-    paragraphs: 3
+    chapterId: 3,
+    startPhrase: 'The development of mindful awareness in MBCT is initially focused on illuminating and revealing to participants',
+    paragraphs: 2
   },
   {
     id: 'doing-mode',
     title: 'Doing mode',
     chapterId: 5,
-    startPhrase: 'Doing mode is primarily a conceptual, thought-based mode',
-    paragraphs: 3
+    startPhrase: 'An essential premise of MBCT is that the mind has two broad modes',
+    paragraphs: 2
   },
   {
     id: 'being-mode',
     title: 'Being mode',
     chapterId: 9,
-    startPhrase: 'The felt experience of dwelling in being mode',
-    paragraphs: 3
+    startPhrase: 'As described in Point 5, a central premise of MBCT is that the mind operates in different modes',
+    paragraphs: 1
   },
   {
     id: 'rumination',
     title: 'The trap of rumination',
     chapterId: 6,
-    startPhrase: 'Rumination is propelled by an attempt to solve',
-    paragraphs: 3
+    startPhrase: 'Rumination is an attempt to address difficult emotions through a process of analysis and problem solving',
+    paragraphs: 1
   },
   {
     id: 'avoidance',
     title: 'Experiential avoidance',
     chapterId: 7,
-    startPhrase: 'pain is inevitable, suffering is not',
-    paragraphs: 3
+    startPhrase: 'A crucial part of our natural survival processes is our aversive reaction to unpleasant feelings',
+    paragraphs: 1
   },
   {
     id: 'acceptance',
     title: 'Acceptance',
     chapterId: 11,
-    startPhrase: 'Acceptance can be confused with resignation',
-    paragraphs: 4
+    startPhrase: 'Acceptance can be confused with resignation and giving up',
+    paragraphs: 2
   },
   {
     id: 'decentring',
     title: 'Thoughts are not facts',
     chapterId: 12,
-    startPhrase: 'It is remarkable how liberating it feels',
-    paragraphs: 3
+    startPhrase: 'At the heart of mindfulness practice is a paradox',
+    paragraphs: 1
   },
   {
     id: 'body',
     title: 'The body as doorway',
     chapterId: 10,
-    startPhrase: 'The body is the most accessible ground of our direct experience',
-    paragraphs: 3
+    startPhrase: 'Training in mindfulness places a great deal of emphasis on learning to be with direct experience as it arises in the body',
+    paragraphs: 2
   },
   {
     id: 'awareness',
     title: 'Awareness as container',
     chapterId: 13,
-    startPhrase: 'the awareness of depression is not depressed',
-    paragraphs: 4
+    startPhrase: 'It can feel tremendously reassuring to hear that awareness can contain any experience that emerges',
+    paragraphs: 2
+  },
+];
+
+const TEACHING_GROUPS = [
+  {
+    label: 'The foundation',
+    ids: ['mindfulness']
+  },
+  {
+    label: 'How suffering arises',
+    ids: ['automatic-pilot', 'doing-mode', 'rumination', 'avoidance']
+  },
+  {
+    label: 'The way through',
+    ids: ['being-mode', 'body', 'acceptance', 'decentring', 'awareness']
   },
 ];
 
@@ -542,14 +570,27 @@ function renderParas(text) {
       continue;
     }
 
-    // Short parenthetical citation
-    if (lines.length === 1 && joined.length < 80 && /^\(/.test(joined)) {
-      html += `<p style="color:var(--text-soft);font-size:.9em;margin-top:-.6em">${escHtml(joined)}</p>`;
+    // Short parenthetical citation or footnote reference
+    if (lines.length === 1 && joined.length < 100 && (/^\(/.test(joined) || /^\d+ /.test(joined))) {
+      html += `<p style="color:var(--text-soft);font-size:.85em;margin-top:-.5em">${escHtml(joined)}</p>`;
       continue;
     }
 
-    // Section heading: short, no trailing sentence punct, starts with capital
-    const isHeader = joined.length < 90 && lines.length <= 3 &&
+    // Paragraph with an inline section heading on the first line
+    // (first line: short, no sentence-ending punct, starts with capital; body follows)
+    const firstLine = lines[0];
+    const bodyLines = lines.slice(1);
+    const firstLineIsHeading = firstLine.length < 80 &&
+      !/[.!?]$/.test(firstLine) && /^[A-Z"']/.test(firstLine) &&
+      !/^[·\d]/.test(firstLine) && bodyLines.length >= 1 &&
+      bodyLines.join(' ').length > 40;
+    if (firstLineIsHeading) {
+      html += `<h3>${escHtml(firstLine)}</h3><p>${escHtml(bodyLines.join(' '))}</p>`;
+      continue;
+    }
+
+    // Standalone section heading
+    const isHeader = joined.length < 90 && lines.length <= 2 &&
       !/[.!?)]$/.test(joined) && /^[A-Z"']/.test(joined) &&
       !/^[·\d]/.test(joined[0]);
     if (isHeader) { html += `<h3>${escHtml(joined)}</h3>`; continue; }
@@ -565,15 +606,21 @@ function extractPassage(chapterId, startPhrase, count) {
   if (!ch) return { key: '', more: '' };
   const paras = ch.body.split('\n\n').filter(p => p.trim());
 
-  let idx = paras.findIndex(p => p.toLowerCase().includes(startPhrase.toLowerCase()));
+  // Normalize newlines to spaces for searching (PDF text has hard-wrapped lines)
+  const phraseLower = startPhrase.toLowerCase();
+  let idx = paras.findIndex(p => p.toLowerCase().replace(/\n/g,' ').includes(phraseLower));
   if (idx === -1) idx = 0;
 
-  const keyParas = paras.slice(idx, idx + count);
-  const moreParas = paras.slice(idx + count, idx + count + 8);
+  // Trim the starting paragraph to begin exactly at the phrase
+  let firstPara = paras[idx];
+  const norm = firstPara.toLowerCase().replace(/\n/g,' ');
+  const phrasePos = norm.indexOf(phraseLower);
+  if (phrasePos > 0) firstPara = firstPara.slice(phrasePos);
 
+  const all = [firstPara, ...paras.slice(idx + 1)];
   return {
-    key: keyParas.join('\n\n'),
-    more: moreParas.join('\n\n')
+    key: all.slice(0, count).join('\n\n'),
+    more: all.slice(count, count + 8).join('\n\n')
   };
 }
 
@@ -616,23 +663,41 @@ function toggleTOC() {
 }
 
 /* ═══ TEACHING CARDS ═══ */
+function makeTeachingCard(t) {
+  const card = document.createElement('div');
+  card.className = 'teaching-card';
+  card.setAttribute('role','button');
+  card.setAttribute('tabindex','0');
+  card.onclick = () => showTeaching(t.id);
+  card.onkeydown = e => { if (e.key==='Enter'||e.key===' ') showTeaching(t.id); };
+  card.innerHTML = `
+    <div class="teaching-tag">Feature ${t.chapterId}</div>
+    <div class="teaching-title">${escHtml(t.title)}</div>
+    <svg class="teaching-arrow" width="7" height="11" viewBox="0 0 7 11" fill="none">
+      <path d="M1 1l4.5 4.5L1 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`;
+  return card;
+}
+
 function renderTeachings() {
-  const grid = document.getElementById('teachings-grid');
-  KEY_TEACHINGS.forEach(t => {
-    const card = document.createElement('div');
-    card.className = 'teaching-card';
-    card.setAttribute('role','button');
-    card.setAttribute('tabindex','0');
-    card.onclick = () => showTeaching(t.id);
-    card.onkeydown = e => { if (e.key==='Enter'||e.key===' ') showTeaching(t.id); };
-    const ch = CHAPTERS.find(c => c.id === t.chapterId);
-    card.innerHTML = `
-      <div class="teaching-tag">Feature ${t.chapterId}</div>
-      <div class="teaching-title">${escHtml(t.title)}</div>
-      <svg class="teaching-arrow" width="7" height="11" viewBox="0 0 7 11" fill="none">
-        <path d="M1 1l4.5 4.5L1 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>`;
-    grid.appendChild(card);
+  const container = document.getElementById('teachings-container');
+  TEACHING_GROUPS.forEach(group => {
+    const section = document.createElement('div');
+    section.className = 'teachings-group';
+
+    const label = document.createElement('div');
+    label.className = 'teachings-group-label';
+    label.textContent = group.label;
+    section.appendChild(label);
+
+    const grid = document.createElement('div');
+    grid.className = 'teachings-grid' + (group.ids.length === 1 ? ' single' : '');
+    group.ids.forEach(id => {
+      const t = KEY_TEACHINGS.find(x => x.id === id);
+      if (t) grid.appendChild(makeTeachingCard(t));
+    });
+    section.appendChild(grid);
+    container.appendChild(section);
   });
 }
 
