@@ -113,51 +113,41 @@ body {
 .toc-hero .book-title { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
 .toc-hero .book-author { font-size: 13px; color: var(--text-soft); }
 
-/* ── Narrative section ── */
-.narrative-section {
-  padding: 22px 16px 20px;
-  border-bottom: 1px solid var(--border);
-}
-.section-eyebrow {
-  display: block;
-  font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
-  color: var(--text-soft); margin-bottom: 16px;
-}
-.narrative-sentence {
-  font-family: var(--font-body); font-size: 15px; line-height: 1.8;
-  color: var(--text); padding: 12px 0;
-  border-bottom: 1px solid var(--border);
-}
-.narrative-sentence:first-of-type { padding-top: 0; }
-.narrative-sentence:last-of-type { border-bottom: none; padding-bottom: 0; }
-
-/* ── Action plan section ── */
-.action-section { padding: 22px 16px 12px; }
-.action-step {
-  display: flex; gap: 14px; margin-bottom: 26px;
+/* ── Visual web section ── */
+.web-section { padding: 22px 16px 4px; }
+.web-node {
+  position: relative;
+  padding: 0 0 26px 26px;
   cursor: pointer; -webkit-tap-highlight-color: transparent;
 }
-.action-step:last-child { margin-bottom: 0; }
-.action-step:active .action-content { opacity: 0.6; }
-.action-num {
-  width: 26px; height: 26px; border-radius: 50%;
-  background: var(--accent-light); color: var(--accent);
-  font-size: 11px; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; margin-top: 2px;
+.web-node:last-child { padding-bottom: 0; }
+.web-node::before {
+  content: '';
+  position: absolute; left: 0; top: 3px;
+  width: 11px; height: 11px; border-radius: 50%;
+  background: var(--bg); border: 2px solid var(--accent);
+  box-sizing: border-box;
 }
-.action-content { flex: 1; min-width: 0; }
-.action-title {
+.web-node::after {
+  content: '';
+  position: absolute; left: 4.5px; top: 16px; bottom: -14px;
+  width: 2px; background: var(--border);
+}
+.web-node:last-child::after { display: none; }
+.web-node.practice::before { background: var(--accent); }
+.web-node:active .web-content { opacity: 0.6; }
+.web-tag {
+  display: block;
+  font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 6px;
+}
+.web-title {
   font-size: 15px; font-weight: 700; color: var(--text);
-  line-height: 1.3; margin-bottom: 8px;
+  line-height: 1.3; margin-bottom: 6px;
 }
-.action-quote {
-  font-family: var(--font-body); font-size: 14px; line-height: 1.72;
-  color: var(--text-soft); font-style: italic; margin-bottom: 8px;
-}
-.action-more {
-  font-size: 12px; font-weight: 600; color: var(--accent);
-  display: inline-flex; align-items: center; gap: 3px;
+.web-caption {
+  font-family: var(--font-body); font-size: 13.5px; line-height: 1.65;
+  color: var(--text-soft); font-style: italic;
 }
 
 /* ── All Features section (TOC) ── */
@@ -531,40 +521,51 @@ const KEY_TEACHINGS = [
   },
 ];
 
-/* ── The four key sentences that tell the MBCT story ── */
-const NARRATIVE = [
-  'Mindfulness is the awareness that emerges when we pay attention to experience in a particular way: on purpose, in the present moment, and nonjudgementally.',
-  'Doing mode is primarily a conceptual, thought-based mode of processing experience: we are ‘thinking about’ rather than ‘being with’ our direct experience. The thoughts that are the ‘currency’ of this mode of mind become our reality.',
-  'Rumination is an attempt to address difficult emotions through a process of analysis and problem solving. The interconnected relapse-related processes of ruminative thinking and experiential avoidance arise out of and are perpetuated by the activities of the doing mode of mind.',
-  'The shift towards a more mindful mode of being, which involves both acceptance and paying attention to the actuality of the present moment, enables participants to access new ways to process or ‘be with’ depression-related and other aspects of experience.',
-];
-
-/* ── Five concrete steps for difficult moments ── */
-const ACTION_STEPS = [
+/* ── One connected web: 4 understanding nodes → 3 practice nodes ── */
+const WEB = [
   {
-    title: 'Notice you’re in doing mode',
-    quote: 'A key intention of the programme is to enable participants to recognise the mode of mind that they are in, and to be able to intentionally shift from one mode to another.',
-    teachingId: 'automatic-pilot'
+    tag: 'Understand',
+    title: 'What mindfulness is',
+    caption: 'The awareness that emerges when we pay attention to experience in a particular way.',
+    teachingId: 'mindfulness',
+    group: 'story'
   },
   {
-    title: 'Shift — use the body or breath',
-    quote: 'The ability to “wake up” while in the midst of things in daily life can take the form of a momentary sense of awareness of the sensations of the feet on the floor or of the breath. In that moment, instead of being caught up with whatever mind state predominates we change perspective.',
-    teachingId: 'being-mode'
+    title: 'Doing mode',
+    caption: 'We are “thinking about” rather than “being with” our direct experience.',
+    teachingId: 'doing-mode',
+    group: 'story'
   },
   {
-    title: 'Turn towards, not away',
-    quote: 'We are learning to be present with and acceptant of pleasant, unpleasant and neutral experience—developing an even-handedness towards our experience. We learn to be tender, gentle, kindly, compassionate and respectful towards ourselves and our experience.',
-    teachingId: 'acceptance'
+    title: 'The trap of rumination',
+    caption: 'Rumination is an attempt to address difficult emotions through a process of analysis and problem solving.',
+    teachingId: 'rumination',
+    group: 'story'
   },
   {
-    title: 'Let thoughts be thoughts',
-    quote: 'The invitation is to designate another focus of attention such as the breath to anchor the attention into the present moment. We note the thoughts as they arise, and then let go of them, returning to the primary focus of attention on the breath. This is done with a sense of kindliness and gentleness but also with persistence and firmness.',
-    teachingId: 'decentring'
+    title: 'Being mode',
+    caption: 'The ability to “wake up” while in the midst of things in daily life can take the form of a momentary sense of awareness of the sensations of the feet on the floor or of the breath.',
+    teachingId: 'being-mode',
+    group: 'story'
   },
   {
-    title: 'Rest in awareness',
-    quote: 'The awareness of our experience is not the experience itself: the awareness of depression is not depressed; the awareness of pain is not itself in pain. We are able to be with this experience, see around it and see it in a wider context.',
-    teachingId: 'awareness'
+    tag: 'Apply',
+    title: 'Acceptance',
+    caption: 'It engages us in a turning toward (opening to) rather than a turning away (closing down) from present-moment experience.',
+    teachingId: 'acceptance',
+    group: 'practice'
+  },
+  {
+    title: 'Thoughts are not facts',
+    caption: 'We note the thoughts as they arise, and then let go of them.',
+    teachingId: 'decentring',
+    group: 'practice'
+  },
+  {
+    title: 'Awareness as container',
+    caption: 'The awareness of our experience is not the experience itself: the awareness of depression is not depressed; the awareness of pain is not itself in pain.',
+    teachingId: 'awareness',
+    group: 'practice'
   },
 ];
 
@@ -813,60 +814,29 @@ function toggleTOC() {
 function renderHomeContent() {
   const container = document.getElementById('teachings-container');
 
-  // Part 1: The philosophy — four connected sentences
-  const narrativeSec = document.createElement('div');
-  narrativeSec.className = 'narrative-section';
+  // One continuous web: understanding the pattern, then the practice that breaks it
+  const webSec = document.createElement('div');
+  webSec.className = 'web-section';
 
-  const narrativeEyebrow = document.createElement('span');
-  narrativeEyebrow.className = 'section-eyebrow';
-  narrativeEyebrow.textContent = 'The philosophy';
-  narrativeSec.appendChild(narrativeEyebrow);
-
-  NARRATIVE.forEach(text => {
-    const p = document.createElement('div');
-    p.className = 'narrative-sentence';
-    p.textContent = text;
-    narrativeSec.appendChild(p);
-  });
-  container.appendChild(narrativeSec);
-
-  // Part 2: Action plan — five numbered steps for difficult moments
-  const actionSec = document.createElement('div');
-  actionSec.className = 'action-section';
-
-  const actionEyebrow = document.createElement('span');
-  actionEyebrow.className = 'section-eyebrow';
-  actionEyebrow.textContent = 'When difficult emotions arise';
-  actionSec.appendChild(actionEyebrow);
-
-  ACTION_STEPS.forEach((step, i) => {
+  WEB.forEach(node => {
     const row = document.createElement('div');
-    row.className = 'action-step';
+    row.className = 'web-node' + (node.group === 'practice' ? ' practice' : '');
     row.setAttribute('role', 'button');
     row.setAttribute('tabindex', '0');
-    row.onclick = () => showTeaching(step.teachingId);
-    row.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') showTeaching(step.teachingId); };
-
-    const numEl = document.createElement('div');
-    numEl.className = 'action-num';
-    numEl.textContent = i + 1;
+    row.onclick = () => showTeaching(node.teachingId);
+    row.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') showTeaching(node.teachingId); };
 
     const content = document.createElement('div');
-    content.className = 'action-content';
+    content.className = 'web-content';
     content.innerHTML = `
-      <div class="action-title">${escHtml(step.title)}</div>
-      <div class="action-quote">${escHtml(step.quote)}</div>
-      <span class="action-more">Read more
-        <svg width="6" height="10" viewBox="0 0 6 10" fill="none">
-          <path d="M1 1l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </span>`;
+      ${node.tag ? `<span class="web-tag">${escHtml(node.tag)}</span>` : ''}
+      <div class="web-title">${escHtml(node.title)}</div>
+      <div class="web-caption">${escHtml(node.caption)}</div>`;
 
-    row.appendChild(numEl);
     row.appendChild(content);
-    actionSec.appendChild(row);
+    webSec.appendChild(row);
   });
-  container.appendChild(actionSec);
+  container.appendChild(webSec);
 }
 
 /* ═══ CHAPTER SUMMARY UTILS ═══ */
