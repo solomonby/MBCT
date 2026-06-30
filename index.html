@@ -138,28 +138,33 @@ body {
 }
 .web-track-label.shift { color: var(--accent); }
 
-.web-node, .web-connector { position: relative; padding-left: 26px; }
-.web-node { padding-bottom: 20px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-.web-node:active { opacity: 0.6; }
+.web-node-wrapper, .web-connector { position: relative; padding-left: 26px; }
+.web-node-wrapper { padding-bottom: 20px; }
 .web-connector {
   padding-bottom: 18px;
   font-family: var(--font-body); font-size: 12.5px; line-height: 1.6;
   color: var(--text-soft); font-style: italic;
 }
-.web-node::before, .web-connector::before {
+.web-node-wrapper::before, .web-connector::before {
   content: '';
   position: absolute; left: 4.5px; top: 0; bottom: 0;
   width: 2px; background: var(--border);
 }
-.web-node.no-line::before { bottom: auto; height: 11px; }
-.web-node::after {
+.web-node-wrapper.no-line::before { bottom: auto; height: 11px; }
+.web-node-wrapper::after {
   content: '';
   position: absolute; left: 0; top: 3px;
   width: 11px; height: 11px; border-radius: 50%;
   background: var(--bg); border: 2px solid var(--accent);
   box-sizing: border-box;
 }
-.web-node.filled::after { background: var(--accent); }
+.web-node-wrapper.filled::after { background: var(--accent); }
+
+.web-node {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.web-node:active { opacity: 0.6; }
 
 .web-title {
   font-size: 15px; font-weight: 700; color: var(--text);
@@ -170,17 +175,46 @@ body {
   color: var(--text-soft); font-style: italic;
 }
 
+.web-chevron {
+  flex-shrink: 0; margin-top: 4px; color: var(--text-soft);
+  transition: transform .2s;
+}
+.web-node-wrapper.expanded .web-chevron,
+.web-pill-wrapper.expanded .web-chevron { transform: rotate(180deg); }
+
+.web-depth { display: none; padding-top: 14px; }
+.web-node-wrapper.expanded > .web-depth,
+.web-pill-wrapper.expanded > .web-depth { display: block; }
+
+.web-depth-quote {
+  font-family: var(--font-body); font-size: 14.5px; line-height: 1.68;
+  color: var(--text); font-style: italic;
+  padding: 2px 0 2px 14px;
+  border-left: 2px solid var(--accent-light);
+  margin-bottom: 12px;
+}
+
+.web-continue {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12.5px; font-weight: 600; color: var(--accent);
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.web-continue:active { opacity: 0.6; }
+.web-continue svg { flex-shrink: 0; }
+
 .web-cluster {
   margin: 2px 0 4px 26px;
   padding: 2px 0 2px 16px;
   border-left: 2px solid var(--accent-light);
 }
+.web-pill-wrapper { border-bottom: 1px solid var(--border); }
+.web-pill-wrapper:last-child { border-bottom: none; }
+.web-pill-wrapper > .web-depth { padding-bottom: 16px; }
 .web-pill {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;
   padding: 14px 0;
-  border-bottom: 1px solid var(--border);
   cursor: pointer; -webkit-tap-highlight-color: transparent;
 }
-.web-pill:last-child { border-bottom: none; padding-bottom: 0; }
 .web-pill:active { opacity: 0.6; }
 .web-pill-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
 .web-pill-caption {
@@ -567,13 +601,19 @@ const TRACK_TRAP = {
   nodeA: {
     title: 'Doing mode',
     caption: 'We are “thinking about” rather than “being with” our direct experience.',
-    teachingId: 'doing-mode'
+    teachingId: 'doing-mode',
+    depth: [
+      'Attention is placed largely either in the past or in the future. We are out of touch with “felt” internal experiencing and with experiencing of the world.'
+    ]
   },
   connector: 'The interconnected relapse-related processes of ruminative thinking and experiential avoidance (see Point 7) arise out of and are perpetuated by the activities of the doing mode of mind.',
   nodeB: {
     title: 'The trap of rumination',
     caption: 'Rumination is an attempt to address difficult emotions through a process of analysis and problem solving.',
-    teachingId: 'rumination'
+    teachingId: 'rumination',
+    depth: [
+      'It is a goal-driven conceptual process of monitoring “what is” in relation to what is desired, required, expected or feared with the intention of solving or eliminating the problem.'
+    ]
   }
 };
 
@@ -582,23 +622,38 @@ const TRACK_SHIFT = {
   hub: {
     title: 'Being mode',
     caption: 'The ability to “wake up” while in the midst of things in daily life can take the form of a momentary sense of awareness of the sensations of the feet on the floor or of the breath.',
-    teachingId: 'being-mode'
+    teachingId: 'being-mode',
+    depth: [
+      'In that moment, instead of being caught up with whatever mind state predominates we change perspective.'
+    ]
   },
   pills: [
     {
       title: 'Acceptance',
       caption: 'A turning toward (opening to) rather than a turning away (closing down) from present-moment experience.',
-      teachingId: 'acceptance'
+      teachingId: 'acceptance',
+      depth: [
+        'Within this we are learning to be present with and acceptant of pleasant, unpleasant and neutral experience—developing an even-handedness towards our experience.'
+      ]
     },
     {
       title: 'Thoughts are not facts',
       caption: 'We note the thoughts as they arise, and then let go of them.',
-      teachingId: 'decentring'
+      teachingId: 'decentring',
+      depth: [
+        'However many thought buses came past . . . , I didn\'t have to catch any of them. I began to let the buses go by, just watching them.',
+        'We learn to relate to the thinking process rather than from the content of thoughts themselves—we can see that our thoughts are not facts, they are just thoughts.',
+        'Teasdale (1999) makes the distinction between metacognitive knowledge (knowing that thoughts are not always accurate) and metacognitive insight (directly experiencing thoughts as events in the field of awareness).'
+      ]
     },
     {
       title: 'Awareness as container',
       caption: 'The awareness of our experience is not the experience itself.',
-      teachingId: 'awareness'
+      teachingId: 'awareness',
+      depth: [
+        'We learn that we can see them as aspects of experience that move through our awareness rather than seeing them as reality.',
+        'We are able to be with this experience, see around it and see it in a wider context.'
+      ]
     }
   ]
 };
@@ -845,30 +900,81 @@ function toggleTOC() {
 }
 
 /* ═══ HOME CONTENT RENDER ═══ */
+function webChevronSvg() {
+  return `<svg class="web-chevron" width="12" height="8" viewBox="0 0 12 8" fill="none">
+    <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`;
+}
+
+function webContinueSvg() {
+  return `<svg width="7" height="12" viewBox="0 0 7 12" fill="none">
+    <path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`;
+}
+
+function makeWebDepth(item) {
+  const depth = document.createElement('div');
+  depth.className = 'web-depth';
+  depth.innerHTML =
+    item.depth.map(q => `<blockquote class="web-depth-quote">${escHtml(q)}</blockquote>`).join('') +
+    `<div class="web-continue" role="button" tabindex="0">Continue in the chapter ${webContinueSvg()}</div>`;
+  const cont = depth.querySelector('.web-continue');
+  cont.onclick = e => { e.stopPropagation(); showTeaching(item.teachingId); };
+  cont.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); showTeaching(item.teachingId); } };
+  return depth;
+}
+
+function bindWebToggle(wrapper, row) {
+  const toggle = () => {
+    const isOpen = wrapper.classList.toggle('expanded');
+    row.setAttribute('aria-expanded', String(isOpen));
+  };
+  row.onclick = toggle;
+  row.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } };
+}
+
 function makeWebNode(node, opts = {}) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'web-node-wrapper' + (opts.filled ? ' filled' : '') + (opts.noLine ? ' no-line' : '');
+
   const row = document.createElement('div');
-  row.className = 'web-node' + (opts.filled ? ' filled' : '') + (opts.noLine ? ' no-line' : '');
+  row.className = 'web-node';
   row.setAttribute('role', 'button');
   row.setAttribute('tabindex', '0');
-  row.onclick = () => showTeaching(node.teachingId);
-  row.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') showTeaching(node.teachingId); };
+  row.setAttribute('aria-expanded', 'false');
   row.innerHTML = `
-    <div class="web-title">${escHtml(node.title)}</div>
-    <div class="web-caption">${escHtml(node.caption)}</div>`;
-  return row;
+    <div class="web-node-main">
+      <div class="web-title">${escHtml(node.title)}</div>
+      <div class="web-caption">${escHtml(node.caption)}</div>
+    </div>
+    ${webChevronSvg()}`;
+  bindWebToggle(wrapper, row);
+  wrapper.appendChild(row);
+
+  if (node.depth && node.depth.length) wrapper.appendChild(makeWebDepth(node));
+  return wrapper;
 }
 
 function makeWebPill(pill) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'web-pill-wrapper';
+
   const row = document.createElement('div');
   row.className = 'web-pill';
   row.setAttribute('role', 'button');
   row.setAttribute('tabindex', '0');
-  row.onclick = () => showTeaching(pill.teachingId);
-  row.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') showTeaching(pill.teachingId); };
+  row.setAttribute('aria-expanded', 'false');
   row.innerHTML = `
-    <div class="web-pill-title">${escHtml(pill.title)}</div>
-    <div class="web-pill-caption">${escHtml(pill.caption)}</div>`;
-  return row;
+    <div class="web-pill-main">
+      <div class="web-pill-title">${escHtml(pill.title)}</div>
+      <div class="web-pill-caption">${escHtml(pill.caption)}</div>
+    </div>
+    ${webChevronSvg()}`;
+  bindWebToggle(wrapper, row);
+  wrapper.appendChild(row);
+
+  if (pill.depth && pill.depth.length) wrapper.appendChild(makeWebDepth(pill));
+  return wrapper;
 }
 
 function renderHomeContent() {
