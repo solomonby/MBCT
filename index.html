@@ -561,7 +561,7 @@ const KEY_TEACHINGS = [
     title: 'Experiential avoidance',
     chapterId: 7,
     startPhrase: 'A crucial part of our natural survival processes is our aversive reaction to unpleasant feelings',
-    paragraphs: 1
+    paragraphs: 4
   },
   {
     id: 'acceptance',
@@ -575,7 +575,7 @@ const KEY_TEACHINGS = [
     title: 'Thoughts are not facts',
     chapterId: 12,
     startPhrase: 'At the heart of mindfulness practice is a paradox',
-    paragraphs: 1
+    paragraphs: 3
   },
   {
     id: 'body',
@@ -589,7 +589,7 @@ const KEY_TEACHINGS = [
     title: 'Awareness as container',
     chapterId: 13,
     startPhrase: 'It can feel tremendously reassuring to hear that awareness can contain any experience that emerges',
-    paragraphs: 2
+    paragraphs: 4
   },
 ];
 
@@ -607,14 +607,27 @@ const TRACK_TRAP = {
     ]
   },
   connector: 'The interconnected relapse-related processes of ruminative thinking and experiential avoidance (see Point 7) arise out of and are perpetuated by the activities of the doing mode of mind.',
-  nodeB: {
-    title: 'The trap of rumination',
-    caption: 'Rumination is an attempt to address difficult emotions through a process of analysis and problem solving.',
-    teachingId: 'rumination',
-    depth: [
-      'It is a goal-driven conceptual process of monitoring “what is” in relation to what is desired, required, expected or feared with the intention of solving or eliminating the problem.'
-    ]
-  }
+  pills: [
+    {
+      title: 'Rumination',
+      caption: 'Rumination is an attempt to address difficult emotions through a process of analysis and problem solving.',
+      teachingId: 'rumination',
+      depth: [
+        'It is a goal-driven conceptual process of monitoring “what is” in relation to what is desired, required, expected or feared with the intention of solving or eliminating the problem.',
+        'Analogous to a car spinning in a muddy rut, the ruminative thinking cycle digs us deeper into well-worn, habitual mental grooves or ruts.'
+      ]
+    },
+    {
+      title: 'Experiential avoidance',
+      caption: 'The attempt to run away from internal experience is futile—in the end we still have to live with ourselves and our experience.',
+      teachingId: 'avoidance',
+      depth: [
+        'In doing this we are erecting a “smokescreen” through which we suppress or disconnect from difficult emotions.',
+        'Gunaratana succinctly said, “pain is inevitable, suffering is not”.',
+        'Welwood (2000) talked of the layers of suffering that we habitually add to primary difficulty—the long-term, stress-related consequences of propping up an identity that is based on avoidance and denial.'
+      ]
+    }
+  ]
 };
 
 const TRACK_SHIFT = {
@@ -643,7 +656,8 @@ const TRACK_SHIFT = {
       depth: [
         'However many thought buses came past . . . , I didn\'t have to catch any of them. I began to let the buses go by, just watching them.',
         'We learn to relate to the thinking process rather than from the content of thoughts themselves—we can see that our thoughts are not facts, they are just thoughts.',
-        'Teasdale (1999) makes the distinction between metacognitive knowledge (knowing that thoughts are not always accurate) and metacognitive insight (directly experiencing thoughts as events in the field of awareness).'
+        'An implicit message within all this is that we are more than the content of our thoughts, our past experiences, our body sensations, our emotions and so on. All these things are not who we are. It is tremendously freeing and liberating to have this perspective on our experiencing.',
+        'William James, writing in 1870, described the illusion of thought ownership: “each pulse of consciousness, each thought, dies away and is replaced by another . . .”. This seemingly endless stream of thinking creates the illusion of a central thinker lying above or behind the mind stream.'
       ]
     },
     {
@@ -651,8 +665,8 @@ const TRACK_SHIFT = {
       caption: 'The awareness of our experience is not the experience itself.',
       teachingId: 'awareness',
       depth: [
-        'We learn that we can see them as aspects of experience that move through our awareness rather than seeing them as reality.',
-        'We are able to be with this experience, see around it and see it in a wider context.'
+        'The awareness of our experience is not the experience itself: the awareness of depression is not depressed; the awareness of pain is not itself in pain.',
+        'A gap is created between our perception of reality and the actuality of reality: “into that gap pours the mischief of our life”.'
       ]
     }
   ]
@@ -1002,7 +1016,10 @@ function renderHomeContent() {
   connector.className = 'web-connector';
   connector.textContent = TRACK_TRAP.connector;
   track1.appendChild(connector);
-  track1.appendChild(makeWebNode(TRACK_TRAP.nodeB, { noLine: true }));
+  const cluster1 = document.createElement('div');
+  cluster1.className = 'web-cluster';
+  TRACK_TRAP.pills.forEach(pill => cluster1.appendChild(makeWebPill(pill)));
+  track1.appendChild(cluster1);
   webSec.appendChild(track1);
 
   // Track 2 — the shift, with three co-equal practices branching from being mode
