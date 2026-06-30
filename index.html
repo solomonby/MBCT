@@ -126,6 +126,28 @@ body {
 }
 .web-track-label.shift { color: var(--accent); }
 
+/* The ground section — distinct tinted band so it reads as the frame the rest
+   sits inside, not just another stacked card in the same list. */
+.web-ground {
+  padding: 22px 16px 20px;
+  background: var(--accent-light);
+  border-bottom: 3px solid var(--accent);
+}
+.web-ground-eyebrow {
+  display: block; padding-left: 26px;
+  font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 14px;
+}
+.web-ground .web-title { font-size: 17px; }
+.web-ground-connector { color: var(--accent); }
+
+/* Everything that follows the ground section is visually housed under it via
+   a continuous left band running down the rest of the web. */
+.web-housed {
+  border-left: 3px solid var(--accent-light);
+  margin-left: 5px;
+}
+
 .web-node-wrapper, .web-connector { position: relative; padding-left: 26px; }
 .web-node-wrapper { padding-bottom: 20px; }
 .web-connector {
@@ -575,7 +597,7 @@ const KEY_TEACHINGS = [
 
 /* ── The starting point: what you are, what you are not — the ground everything else stands on ── */
 const TRACK_GROUND = {
-  label: 'The starting point',
+  label: 'The ground everything else stands on',
   nodeNot: {
     title: 'What you are not',
     caption: 'We are more than the content of our thoughts, our past experiences, our body sensations, our emotions and so on. All these things are not who we are.',
@@ -982,20 +1004,27 @@ function renderHomeContent() {
   const webSec = document.createElement('div');
   webSec.className = 'web-section';
 
-  // The ground everything else stands on — what you are, what you are not
-  const trackGround = document.createElement('div');
-  trackGround.className = 'web-track';
+  // The ground everything else stands on — what you are, what you are not.
+  // Visually distinct (tinted band) so it reads as the frame the rest sits inside,
+  // not just another stacked card.
+  const ground = document.createElement('div');
+  ground.className = 'web-ground';
   const labelG = document.createElement('span');
-  labelG.className = 'web-track-label shift';
+  labelG.className = 'web-ground-eyebrow';
   labelG.textContent = TRACK_GROUND.label;
-  trackGround.appendChild(labelG);
-  trackGround.appendChild(makeWebNode(TRACK_GROUND.nodeNot));
+  ground.appendChild(labelG);
+  ground.appendChild(makeWebNode(TRACK_GROUND.nodeNot));
   const connectorG = document.createElement('div');
-  connectorG.className = 'web-connector';
+  connectorG.className = 'web-connector web-ground-connector';
   connectorG.textContent = TRACK_GROUND.connector;
-  trackGround.appendChild(connectorG);
-  trackGround.appendChild(makeWebNode(TRACK_GROUND.nodeAre, { filled: true, noLine: true }));
-  webSec.appendChild(trackGround);
+  ground.appendChild(connectorG);
+  ground.appendChild(makeWebNode(TRACK_GROUND.nodeAre, { filled: true, noLine: true }));
+  webSec.appendChild(ground);
+
+  // Everything below is housed under that distinction — a continuous band ties
+  // the premise and both tracks back to the ground section above.
+  const housed = document.createElement('div');
+  housed.className = 'web-housed';
 
   // The premise that unifies everything below it
   const frame = document.createElement('div');
@@ -1003,7 +1032,7 @@ function renderHomeContent() {
   frame.innerHTML = `
     <span class="web-frame-eyebrow">The premise</span>
     <div class="web-frame-quote">${escHtml(PREMISE)}</div>`;
-  webSec.appendChild(frame);
+  housed.appendChild(frame);
 
   // Track 1 — the pattern that traps us, with the line connecting cause to effect
   const track1 = document.createElement('div');
@@ -1021,7 +1050,7 @@ function renderHomeContent() {
   cluster1.className = 'web-cluster';
   TRACK_TRAP.pills.forEach(pill => cluster1.appendChild(makeWebPill(pill)));
   track1.appendChild(cluster1);
-  webSec.appendChild(track1);
+  housed.appendChild(track1);
 
   // Track 2 — the shift, with three co-equal practices branching from being mode
   const track2 = document.createElement('div');
@@ -1035,8 +1064,9 @@ function renderHomeContent() {
   cluster.className = 'web-cluster';
   TRACK_SHIFT.pills.forEach(pill => cluster.appendChild(makeWebPill(pill)));
   track2.appendChild(cluster);
-  webSec.appendChild(track2);
+  housed.appendChild(track2);
 
+  webSec.appendChild(housed);
   container.appendChild(webSec);
 }
 
