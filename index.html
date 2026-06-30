@@ -113,40 +113,78 @@ body {
 .toc-hero .book-title { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
 .toc-hero .book-author { font-size: 13px; color: var(--text-soft); }
 
-/* ── Visual web section ── */
-.web-section { padding: 22px 16px 4px; }
-.web-node {
-  position: relative;
-  padding: 0 0 26px 26px;
-  cursor: pointer; -webkit-tap-highlight-color: transparent;
+/* ── Visual web section: one premise, two connected modes ── */
+.web-section { padding-bottom: 4px; }
+
+.web-frame {
+  padding: 20px 16px 22px;
+  border-bottom: 1px solid var(--border);
 }
-.web-node:last-child { padding-bottom: 0; }
-.web-node::before {
+.web-frame-eyebrow {
+  display: block;
+  font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--text-soft); margin-bottom: 10px;
+}
+.web-frame-quote {
+  font-family: var(--font-body); font-size: 18px; font-weight: 600; line-height: 1.45;
+  color: var(--text);
+}
+
+.web-track { padding: 20px 16px 4px; }
+.web-track-label {
+  display: block; padding-left: 26px;
+  font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--text-soft); margin-bottom: 14px;
+}
+.web-track-label.shift { color: var(--accent); }
+
+.web-node, .web-connector { position: relative; padding-left: 26px; }
+.web-node { padding-bottom: 20px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.web-node:active { opacity: 0.6; }
+.web-connector {
+  padding-bottom: 18px;
+  font-family: var(--font-body); font-size: 12.5px; line-height: 1.6;
+  color: var(--text-soft); font-style: italic;
+}
+.web-node::before, .web-connector::before {
+  content: '';
+  position: absolute; left: 4.5px; top: 0; bottom: 0;
+  width: 2px; background: var(--border);
+}
+.web-node.no-line::before { bottom: auto; height: 11px; }
+.web-node::after {
   content: '';
   position: absolute; left: 0; top: 3px;
   width: 11px; height: 11px; border-radius: 50%;
   background: var(--bg); border: 2px solid var(--accent);
   box-sizing: border-box;
 }
-.web-node::after {
-  content: '';
-  position: absolute; left: 4.5px; top: 16px; bottom: -14px;
-  width: 2px; background: var(--border);
-}
-.web-node:last-child::after { display: none; }
-.web-node.practice::before { background: var(--accent); }
-.web-node:active .web-content { opacity: 0.6; }
-.web-tag {
-  display: block;
-  font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
-  color: var(--accent); margin-bottom: 6px;
-}
+.web-node.filled::after { background: var(--accent); }
+
 .web-title {
   font-size: 15px; font-weight: 700; color: var(--text);
   line-height: 1.3; margin-bottom: 6px;
 }
 .web-caption {
   font-family: var(--font-body); font-size: 13.5px; line-height: 1.65;
+  color: var(--text-soft); font-style: italic;
+}
+
+.web-cluster {
+  margin: 2px 0 4px 26px;
+  padding: 2px 0 2px 16px;
+  border-left: 2px solid var(--accent-light);
+}
+.web-pill {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.web-pill:last-child { border-bottom: none; padding-bottom: 0; }
+.web-pill:active { opacity: 0.6; }
+.web-pill-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.web-pill-caption {
+  font-family: var(--font-body); font-size: 13px; line-height: 1.55;
   color: var(--text-soft); font-style: italic;
 }
 
@@ -521,53 +559,49 @@ const KEY_TEACHINGS = [
   },
 ];
 
-/* ── One connected web: 4 understanding nodes → 3 practice nodes ── */
-const WEB = [
-  {
-    tag: 'Understand',
-    title: 'What mindfulness is',
-    caption: 'The awareness that emerges when we pay attention to experience in a particular way.',
-    teachingId: 'mindfulness',
-    group: 'story'
-  },
-  {
+/* ── One premise, two connected modes — the whole philosophy in one shape ── */
+const PREMISE = 'A central premise of MBCT is that the mind operates in different modes.';
+
+const TRACK_TRAP = {
+  label: 'The pattern that traps us',
+  nodeA: {
     title: 'Doing mode',
     caption: 'We are “thinking about” rather than “being with” our direct experience.',
-    teachingId: 'doing-mode',
-    group: 'story'
+    teachingId: 'doing-mode'
   },
-  {
+  connector: 'The interconnected relapse-related processes of ruminative thinking and experiential avoidance (see Point 7) arise out of and are perpetuated by the activities of the doing mode of mind.',
+  nodeB: {
     title: 'The trap of rumination',
     caption: 'Rumination is an attempt to address difficult emotions through a process of analysis and problem solving.',
-    teachingId: 'rumination',
-    group: 'story'
-  },
-  {
+    teachingId: 'rumination'
+  }
+};
+
+const TRACK_SHIFT = {
+  label: 'The shift that frees us',
+  hub: {
     title: 'Being mode',
     caption: 'The ability to “wake up” while in the midst of things in daily life can take the form of a momentary sense of awareness of the sensations of the feet on the floor or of the breath.',
-    teachingId: 'being-mode',
-    group: 'story'
+    teachingId: 'being-mode'
   },
-  {
-    tag: 'Apply',
-    title: 'Acceptance',
-    caption: 'It engages us in a turning toward (opening to) rather than a turning away (closing down) from present-moment experience.',
-    teachingId: 'acceptance',
-    group: 'practice'
-  },
-  {
-    title: 'Thoughts are not facts',
-    caption: 'We note the thoughts as they arise, and then let go of them.',
-    teachingId: 'decentring',
-    group: 'practice'
-  },
-  {
-    title: 'Awareness as container',
-    caption: 'The awareness of our experience is not the experience itself: the awareness of depression is not depressed; the awareness of pain is not itself in pain.',
-    teachingId: 'awareness',
-    group: 'practice'
-  },
-];
+  pills: [
+    {
+      title: 'Acceptance',
+      caption: 'A turning toward (opening to) rather than a turning away (closing down) from present-moment experience.',
+      teachingId: 'acceptance'
+    },
+    {
+      title: 'Thoughts are not facts',
+      caption: 'We note the thoughts as they arise, and then let go of them.',
+      teachingId: 'decentring'
+    },
+    {
+      title: 'Awareness as container',
+      caption: 'The awareness of our experience is not the experience itself.',
+      teachingId: 'awareness'
+    }
+  ]
+};
 
 /* ═══ THEME ═══ */
 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
@@ -811,31 +845,74 @@ function toggleTOC() {
 }
 
 /* ═══ HOME CONTENT RENDER ═══ */
+function makeWebNode(node, opts = {}) {
+  const row = document.createElement('div');
+  row.className = 'web-node' + (opts.filled ? ' filled' : '') + (opts.noLine ? ' no-line' : '');
+  row.setAttribute('role', 'button');
+  row.setAttribute('tabindex', '0');
+  row.onclick = () => showTeaching(node.teachingId);
+  row.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') showTeaching(node.teachingId); };
+  row.innerHTML = `
+    <div class="web-title">${escHtml(node.title)}</div>
+    <div class="web-caption">${escHtml(node.caption)}</div>`;
+  return row;
+}
+
+function makeWebPill(pill) {
+  const row = document.createElement('div');
+  row.className = 'web-pill';
+  row.setAttribute('role', 'button');
+  row.setAttribute('tabindex', '0');
+  row.onclick = () => showTeaching(pill.teachingId);
+  row.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') showTeaching(pill.teachingId); };
+  row.innerHTML = `
+    <div class="web-pill-title">${escHtml(pill.title)}</div>
+    <div class="web-pill-caption">${escHtml(pill.caption)}</div>`;
+  return row;
+}
+
 function renderHomeContent() {
   const container = document.getElementById('teachings-container');
-
-  // One continuous web: understanding the pattern, then the practice that breaks it
   const webSec = document.createElement('div');
   webSec.className = 'web-section';
 
-  WEB.forEach(node => {
-    const row = document.createElement('div');
-    row.className = 'web-node' + (node.group === 'practice' ? ' practice' : '');
-    row.setAttribute('role', 'button');
-    row.setAttribute('tabindex', '0');
-    row.onclick = () => showTeaching(node.teachingId);
-    row.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') showTeaching(node.teachingId); };
+  // The premise that unifies everything below it
+  const frame = document.createElement('div');
+  frame.className = 'web-frame';
+  frame.innerHTML = `
+    <span class="web-frame-eyebrow">The premise</span>
+    <div class="web-frame-quote">${escHtml(PREMISE)}</div>`;
+  webSec.appendChild(frame);
 
-    const content = document.createElement('div');
-    content.className = 'web-content';
-    content.innerHTML = `
-      ${node.tag ? `<span class="web-tag">${escHtml(node.tag)}</span>` : ''}
-      <div class="web-title">${escHtml(node.title)}</div>
-      <div class="web-caption">${escHtml(node.caption)}</div>`;
+  // Track 1 — the pattern that traps us, with the line connecting cause to effect
+  const track1 = document.createElement('div');
+  track1.className = 'web-track';
+  const label1 = document.createElement('span');
+  label1.className = 'web-track-label';
+  label1.textContent = TRACK_TRAP.label;
+  track1.appendChild(label1);
+  track1.appendChild(makeWebNode(TRACK_TRAP.nodeA));
+  const connector = document.createElement('div');
+  connector.className = 'web-connector';
+  connector.textContent = TRACK_TRAP.connector;
+  track1.appendChild(connector);
+  track1.appendChild(makeWebNode(TRACK_TRAP.nodeB, { noLine: true }));
+  webSec.appendChild(track1);
 
-    row.appendChild(content);
-    webSec.appendChild(row);
-  });
+  // Track 2 — the shift, with three co-equal practices branching from being mode
+  const track2 = document.createElement('div');
+  track2.className = 'web-track';
+  const label2 = document.createElement('span');
+  label2.className = 'web-track-label shift';
+  label2.textContent = TRACK_SHIFT.label;
+  track2.appendChild(label2);
+  track2.appendChild(makeWebNode(TRACK_SHIFT.hub, { filled: true, noLine: true }));
+  const cluster = document.createElement('div');
+  cluster.className = 'web-cluster';
+  TRACK_SHIFT.pills.forEach(pill => cluster.appendChild(makeWebPill(pill)));
+  track2.appendChild(cluster);
+  webSec.appendChild(track2);
+
   container.appendChild(webSec);
 }
 
